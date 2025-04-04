@@ -32,6 +32,10 @@ public class Doctor {
     @NotNull(message = "password cannot be empty!")
     private String encryptedPassword;
 
+    private boolean hasAcceptedAppointment;
+
+    private String currentPatientId;
+
     public void setAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
     }

@@ -1,5 +1,6 @@
 package org.HospitalProjectCholda.data.models;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -17,14 +18,21 @@ import java.time.format.DateTimeFormatter;
 public class MedicalHistory {
     @Id
     private String id;
+
+    @NotNull(message = "medical record date cannot be empty!")
     private LocalDateTime recordDate;
+
+    @NotNull(message = "description cannot be empty!")
     private String description;
+
     private String treatment;
 
-//    public MedicalHistory(String recordDate, String description, String treatment) {
-//        this.recordDate =  LocalDate.parse(recordDate, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-//        this.description = description;
-//        this.treatment = treatment;
-//    }
+    public MedicalHistory(LocalDateTime recordDate, String description, String treatment) {
+        this.recordDate = recordDate;
+        this.description = description;
+        this.treatment = treatment;
+    }
+
+
 }
 

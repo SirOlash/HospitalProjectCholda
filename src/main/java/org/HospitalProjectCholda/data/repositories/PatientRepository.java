@@ -13,6 +13,7 @@ public interface PatientRepository extends MongoRepository<Patient, String> {
     Optional<Patient> findByPatientProfile(PatientProfile patientProfile);
 
     Optional<Patient> findByEmail(String email);
+    Optional<Patient> findById(String id);
 
 
 }

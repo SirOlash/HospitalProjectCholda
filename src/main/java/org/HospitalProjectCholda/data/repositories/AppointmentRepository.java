@@ -16,7 +16,4 @@ public interface AppointmentRepository extends MongoRepository<Appointment, Stri
 
     boolean existsByDoctorAndAppointmentStatus(Doctor doctor, AppointmentStatus appointmentStatus);
 
-    Appointment findAppointmentsByDoctor_Email (String email);
-
-//    AppointmentStatus.AppointmentStatus appointmentStatus(AppointmentStatus.AppointmentStatus appointmentStatus);
 }

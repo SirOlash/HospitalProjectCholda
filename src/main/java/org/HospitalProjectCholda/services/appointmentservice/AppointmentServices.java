@@ -3,6 +3,10 @@ package org.HospitalProjectCholda.services.appointmentservice;
 
 import AppointmentStatus.AppointmentStatus;
 import jakarta.validation.ConstraintViolationException;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.data.models.Patient;
@@ -97,5 +101,9 @@ public class AppointmentServices implements IAppointmentActivities{
 
     public void deleteAll() {
         appointmentRepository.deleteAll();
+    }
+
+    public String getPatientId(String appointmentId) {
+        return appointmentRepository.findById(appointmentId).get().getPatient().getId();
     }
 }
