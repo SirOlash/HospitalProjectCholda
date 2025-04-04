@@ -152,8 +152,8 @@ public class PatientServices implements IPatientActivities {
         patientRepository.deleteAll();
     }
 
-    public void viewAvailableDoctors(){
-
+    public List<Doctor> viewAvailableDoctors(){
+        return  doctorRepository.getDoctorsByAvailable(true);
     }
 
 
