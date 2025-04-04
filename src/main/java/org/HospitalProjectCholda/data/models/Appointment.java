@@ -1,9 +1,12 @@
 package org.HospitalProjectCholda.data.models;
 
+import AppointmentStatus.AppointmentStatus;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
@@ -18,21 +21,21 @@ import java.util.Locale;
 public class Appointment {
     @Id
     private String id;
-//    private static final DateTimeFormatter APPOINTMENT_FORMATTER =
-//            new DateTimeFormatterBuilder()
-//                    .parseCaseInsensitive()
-//                    .appendPattern("dd-MM-yyyy h:mm a")
-//                    .toFormatter(Locale.ENGLISH);
 
+    @NotNull(message = "Appointment time cannot be empty!")
     private LocalDateTime appointmentTime;
-    private Patient patient;
-    private String doctorId;
-    private String description;
 
-//    public Appointment(String appointmentDateTime, Patient patient, String doctorId, String description) {
-//        this.appointmentTime = LocalDateTime.parse(appointmentDateTime, APPOINTMENT_FORMATTER);
-//        this.patient = patient;
-//        this.doctorId = doctorId;
-//        this.description = description;
-//    }
+    @DBRef
+    private Patient patient;
+
+    @DBRef
+    private Doctor doctor;
+
+    @NotNull(message =  "Doctor's email cannot be empty!")
+//    private String doctorEmail;
+    private String description;
+    private AppointmentStatus appointmentStatus;
+    private LocalDateTime createdAt;
+//    private LocalDateTime updatedAt;
+
 }

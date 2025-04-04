@@ -1,33 +1,41 @@
 package org.HospitalProjectCholda.data.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
+@Setter
+@Getter
 @Document(collection = "doctor")
 public class Doctor {
     @Id
     private String id;
     @DBRef
     private DoctorProfile doctorProfile;
+
+    @NotNull(message = "username cannot be empty!")
     private String userName;
+
+    @NotNull(message = "email cannot be empty!")
     private String email;
-    private String password;
+
+    @Setter
     private boolean isAvailable = true;
 
-//    public Doctor(String userName, String email, String password) {
-//        this.userName = userName;
-//        this.email = email;
-//        this.password = password;
-//        this.id = id;
-//    }
+    @NotNull(message = "password cannot be empty!")
+    private String encryptedPassword;
 
-
+    public void setAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
 
 }
+
+

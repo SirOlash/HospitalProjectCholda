@@ -1,7 +1,9 @@
 package org.HospitalProjectCholda.services;
 
 import org.HospitalProjectCholda.data.models.Doctor;
-import org.HospitalProjectCholda.exceptions.DuplicateUserException;
+import org.HospitalProjectCholda.data.models.Patient;
+import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
+import org.HospitalProjectCholda.services.doctorservice.DoctorServices;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,57 +14,54 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class DoctorServicesTest {
+
     @Autowired
     private DoctorServices doctorServices;
 
     @BeforeEach
     void setUp() {
         doctorServices.deleteAll();
-    }
 
+        Doctor signedUpDoctor = new Doctor();
+
+        signedUpDoctor.setUserName("ben");
+        signedUpDoctor.setEmail("ben@gmail.com");
+        signedUpDoctor.setEncryptedPassword("1234");
+        doctorServices.createNewDoctor(signedUpDoctor);
+
+    }
     @AfterEach
     void tearDown() {
         doctorServices.deleteAll();
     }
-
     @Test
     public void testThatYouCanRegisterDoctor() {
-        Doctor doctor = new Doctor();
-        doctor.setUserName("chibuzor");
-        doctor.setEmail("chibuzor@gmail.com");
-        doctor.setPassword("1234");
-        Doctor newDoctor = doctorServices.createNewDoctor(doctor);
-        assertNotNull(newDoctor);
-        assertEquals(1,doctorServices.count());
-    }
 
+        assertEquals(1,doctorServices.countAllDoctors());
+    }
     @Test
-    public void testThatExceptionIsThrownWhenSameDoctorRegisterTwice(){
-        Doctor doctor = new Doctor();
-        doctor.setUserName("chibuzor");
-        doctor.setEmail("chibuzor@gmail.com");
-        doctor.setPassword("1234");
+    public void testDoctorCanLogin_Successfully() {
+        Doctor doctor = doctorServices.doctorLogin("ben@gmail.com", "1234");
 
-        Doctor newDoctor = doctorServices.createNewDoctor(doctor);
-        assertNotNull(newDoctor);
-        assertEquals(1, doctorServices.count());
+        assertNotNull(doctor);
+        assertEquals("ben@gmail.com",doctor.getEmail());
+        assertEquals("ben",doctor.getUserName());
 
-        DuplicateUserException exception = assertThrows(DuplicateUserException.class, () -> {
-            doctorServices.createNewDoctor(doctor);
-        });
-        assertEquals("Doctor with email chibuzor@gmail.com already exists", exception.getMessage());
     }
-
     @Test
-    public void testThatUserCanLogin() {
-        Doctor doctor = new Doctor();
-        doctor.setUserName("chibuzor");
-        doctor.setEmail("chibuzor@gmail.com");
-        doctor.setPassword("1234");
+    public void test_ThrowsDoctorNotFoundException() {
 
-        Doctor newDoctor = doctorServices.createNewDoctor(doctor);
-        assertNotNull(newDoctor);
-        assertEquals(1,doctorServices.count());
+        String email = "joe@gmail.com";
+        DoctorCollectionException wrongEmail = assertThrows(DoctorCollectionException.class, () -> doctorServices.doctorLogin(email, "123"));
+        assertEquals("Doctor with email: " + email + " not found", wrongEmail.getMessage());
+
     }
+    @Test
+    public void test_ThrowsInvalidPasswordException() {
 
+        String email = "ben@gmail.com";
+        String password = "1235";
+        DoctorCollectionException wrongPassword = assertThrows(DoctorCollectionException.class, () -> doctorServices.doctorLogin("ben@gmail.com", "1235"));
+        assertEquals("Invalid email or password", wrongPassword.getMessage());
+    }
 }
