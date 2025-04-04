@@ -15,4 +15,6 @@ public interface IDoctorActivities {
     public List<Doctor> getAllDoctors();
     public Doctor getSpecificDoctor(String doctorsId) throws DoctorCollectionException;
     public void updateDoctor(String doctorsId, Doctor doctor) throws DoctorCollectionException;
+    public void updateDoctorAvailability(String doctorsId, boolean available) throws DoctorCollectionException;
+    public boolean hasBeenScheduled(Doctor doctor);
 }

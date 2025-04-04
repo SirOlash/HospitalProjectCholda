@@ -79,6 +79,19 @@ public class AppointmentServices implements IAppointmentActivities{
 //
     }
 
+    @Override
+    public Appointment completeAppointment(String appointmentId) {
+        Appointment appointments = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new AppointmentCollectionException(appointmentId));
+
+        appointments.setAppointmentStatus(AppointmentStatus.COMPLETED);
+        appointmentRepository.save(appointments);
+
+//        notificationService.sendToDoctor(appointments.getDoctor().getId(), "Appointment completed. Update your availability!");
+
+        return appointments;
+    }
+
     public void deleteAll() {
         appointmentRepository.deleteAll();
     }

@@ -1,5 +1,6 @@
 package org.HospitalProjectCholda.services.appointmentservice;
 
+import AppointmentStatus.AppointmentStatus;
 import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.data.models.Patient;
@@ -19,6 +20,8 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class AppointmentServicesTest {
+
+    private Doctor signedUpDoctor;
 
     @Autowired
     private AppointmentServices appointmentServices;
@@ -50,9 +53,7 @@ class AppointmentServicesTest {
         patientServices.createNewPatient(signedUpPatient);
 
         Patient loggedInPatient = patientServices.patientLogin("john@example.com", "password");
-
-
-        Doctor signedUpDoctor = new Doctor();
+        signedUpDoctor = new Doctor();
         signedUpDoctor.setUserName("ben");
         signedUpDoctor.setEmail("ben@gmail.com");
         signedUpDoctor.setEncryptedPassword("1234");
@@ -98,5 +99,17 @@ class AppointmentServicesTest {
         appointmentRequest.setDescription("Malaria parasite");
         assertThrows(DoctorCollectionException.class, () ->patientServices.bookAppointment(appointmentRequest));
     }
+    @Test
+    public void test_Throws_DoctorIs_Set_Available_When_No_Appointment() throws DoctorCollectionException {
+        assertTrue(doctorRepository.findById(signedUpDoctor.getId())
+                .orElseThrow().isAvailable());
+        doctorServices.updateDoctorAvailability(signedUpDoctor.getId(), true);
+        Doctor availableDoctor = doctorRepository.findById(signedUpDoctor.getId())
+                .orElseThrow();
+
+        assertTrue(availableDoctor.isAvailable());
+
+    }
+//
 
 }

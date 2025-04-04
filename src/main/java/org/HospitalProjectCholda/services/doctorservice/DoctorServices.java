@@ -1,7 +1,9 @@
 package org.HospitalProjectCholda.services.doctorservice;
 
+import AppointmentStatus.AppointmentStatus;
 import jakarta.validation.ConstraintViolationException;
 import org.HospitalProjectCholda.data.models.Doctor;
+import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
@@ -21,6 +23,8 @@ public class DoctorServices implements IDoctorActivities {
 
     @Autowired
     private PasswordService passwordService;
+    @Autowired
+    private AppointmentRepository appointmentRepository;
 
     @Override
     public void createNewDoctor(Doctor doctor) throws ConstraintViolationException,  PatientCollectionException {
@@ -119,6 +123,21 @@ public class DoctorServices implements IDoctorActivities {
             }
 
         }
+
+    @Override
+    public void updateDoctorAvailability(String doctorsId, boolean isAvailable) throws DoctorCollectionException {
+        Doctor availableDoctor = doctorRepository.findById(doctorsId)
+                .orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(doctorsId)));
+        if(isAvailable && hasBeenScheduled(availableDoctor)) throw new IllegalStateException("Cannot set status while still having a pending appointment!");
+        availableDoctor.setAvailable(isAvailable);
+        doctorRepository.save(availableDoctor);
+
+    }
+
+    @Override
+    public boolean hasBeenScheduled(Doctor doctor) {
+        return appointmentRepository.existsByDoctorAndAppointmentStatus(doctor, AppointmentStatus.SCHEDULED);
+    }
 
 }
 

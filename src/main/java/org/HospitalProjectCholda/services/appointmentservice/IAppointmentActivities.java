@@ -11,4 +11,5 @@ public interface IAppointmentActivities {
 //    public boolean checkPatientCanBookAppointment(String patientId, String doctorEmail);
 //    public Appointment createAppointment(Appointment appointment);
     public Appointment createAppointment(AppointmentRequest request);
+    public Appointment completeAppointment(String appointmentId);
 }
