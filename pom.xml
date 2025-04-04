@@ -76,6 +76,13 @@
             <version>6.4.4</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-mongodb -->
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-mongodb</artifactId>
+            <version>4.4.2</version>
+        </dependency>
+
     </dependencies>
 
     <build>

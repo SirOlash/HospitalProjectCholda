@@ -2,10 +2,12 @@ package org.HospitalProjectCholda.services.doctorservice;
 
 import AppointmentStatus.AppointmentStatus;
 import jakarta.validation.ConstraintViolationException;
+import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
+import org.HospitalProjectCholda.exceptions.NoAppointmentException;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,6 +140,9 @@ public class DoctorServices implements IDoctorActivities {
     public boolean hasBeenScheduled(Doctor doctor) {
         return appointmentRepository.existsByDoctorAndAppointmentStatus(doctor, AppointmentStatus.SCHEDULED);
     }
+
+
+
 
 }
 

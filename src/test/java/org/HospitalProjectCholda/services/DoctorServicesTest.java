@@ -64,4 +64,6 @@ class DoctorServicesTest {
         DoctorCollectionException wrongPassword = assertThrows(DoctorCollectionException.class, () -> doctorServices.doctorLogin("ben@gmail.com", "1235"));
         assertEquals("Invalid email or password", wrongPassword.getMessage());
     }
+
+
 }

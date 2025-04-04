@@ -12,6 +12,7 @@ import org.HospitalProjectCholda.data.repositories.PatientRepository;
 import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
 import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
+import org.HospitalProjectCholda.exceptions.NoAppointmentException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -79,6 +80,7 @@ public class AppointmentServices implements IAppointmentActivities{
 //
     }
 
+
     @Override
     public Appointment completeAppointment(String appointmentId) {
         Appointment appointments = appointmentRepository.findById(appointmentId)
@@ -91,6 +93,7 @@ public class AppointmentServices implements IAppointmentActivities{
 
         return appointments;
     }
+
 
     public void deleteAll() {
         appointmentRepository.deleteAll();

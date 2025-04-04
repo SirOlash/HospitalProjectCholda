@@ -60,6 +60,7 @@ class AppointmentServicesTest {
         signedUpDoctor.setAvailable(true);
         doctorServices.createNewDoctor(signedUpDoctor);
 
+
         this.appointmentRequest = new AppointmentRequest();
         appointmentRequest.setPatient(loggedInPatient);
         appointmentRequest.setDoctorEmail("ben@gmail.com");
@@ -110,6 +111,8 @@ class AppointmentServicesTest {
         assertTrue(availableDoctor.isAvailable());
 
     }
+
+//
 //
 
 }
