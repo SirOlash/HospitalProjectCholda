@@ -6,8 +6,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -27,7 +25,7 @@ public class Doctor {
     private String email;
 
     @Setter
-    private boolean isAvailable = true;
+    private boolean available = true;
 
     @NotNull(message = "password cannot be empty!")
     private String encryptedPassword;
@@ -36,9 +34,9 @@ public class Doctor {
 
     private String currentPatientId;
 
-    public void setAvailable(boolean isAvailable) {
-        this.isAvailable = isAvailable;
-    }
+//    public void setAvailable(boolean available) {
+//        this.available = available;
+//    }
 
 }
 

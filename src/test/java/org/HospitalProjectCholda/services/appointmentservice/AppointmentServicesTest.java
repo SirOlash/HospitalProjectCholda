@@ -1,6 +1,5 @@
 package org.HospitalProjectCholda.services.appointmentservice;
 
-import AppointmentStatus.AppointmentStatus;
 import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.data.models.MedicalHistory;
@@ -9,7 +8,6 @@ import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
 import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
-import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.services.doctorservice.DoctorServices;
 import org.HospitalProjectCholda.services.patientservice.PatientServices;
@@ -73,6 +71,7 @@ class AppointmentServicesTest {
         appointmentRequest.setDoctorEmail("ben@gmail.com");
         appointmentRequest.setDescription("description");
 
+
     }
     @Test
     public void test_Patient_Can_Book_Appointment(){
@@ -82,6 +81,7 @@ class AppointmentServicesTest {
         assertEquals("John", bookedAppointment.getPatient().getUserName());
         assertEquals("john@example.com", bookedAppointment.getPatient().getEmail());
         assertEquals("description", bookedAppointment.getDescription());
+        assertFalse(bookedAppointment.getDoctor().isAvailable());
 
     }
     @Test
@@ -191,8 +191,50 @@ class AppointmentServicesTest {
         assertEquals("Luma tern 500mg prescribed to patient", updatedPatientRecord.getTreatment());
 
 
+    }
+
+    @Test
+    public void testThatPatientCanViewAvailableDoctors() {
+        appointmentServices.createAppointment(appointmentRequest);
+        assertTrue(signedUpDoctor.isAvailable());
+        Doctor signedUpDoctor2 = new Doctor();
+        signedUpDoctor2.setUserName("ben2");
+        signedUpDoctor2.setEmail("ben2@gmail.com");
+        signedUpDoctor2.setEncryptedPassword("1234");
+        signedUpDoctor2.setAvailable(true);
+        doctorServices.createNewDoctor(signedUpDoctor2);
+
+        Doctor signedUpDoctor3 = new Doctor();
+        signedUpDoctor3.setUserName("ben3");
+        signedUpDoctor3.setEmail("ben3@gmail.com");
+        signedUpDoctor3.setEncryptedPassword("1234");
+        signedUpDoctor3.setAvailable(true);
+        doctorServices.createNewDoctor(signedUpDoctor3);
 
 
+
+        Patient signedUpPatient2 = new Patient();
+        signedUpPatient2.setUserName("John");
+        signedUpPatient2.setEmail("joh@example.com");
+        signedUpPatient2.setEncryptedPassword("password");
+        patientServices.createNewPatient(signedUpPatient2);
+        Patient loggedInPatient2 = patientServices.patientLogin("joh@example.com", "password");
+
+        AppointmentRequest appointmentRequest2 = new AppointmentRequest();
+        appointmentRequest2.setPatient(loggedInPatient2);
+        appointmentRequest2.setDoctorEmail("ben3@gmail.com");
+        appointmentRequest2.setDescription("description");
+
+        Appointment appointment2 = appointmentServices.createAppointment(appointmentRequest2);
+        System.out.println(appointment2.getDoctor().getUserName());
+        System.out.println(appointment2.getDoctor().isAvailable());
+
+
+
+
+        assertEquals(1,doctorServices.viewAvailableDoctors().size());
+//        System.out.println(doctorServices.viewAvailableDoctors());
+        //loggedInPatient
     }
 
 

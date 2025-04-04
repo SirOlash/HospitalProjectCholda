@@ -21,4 +21,5 @@ public interface IDoctorActivities {
     public boolean isAppointmentAccepted(Doctor doctor, String appointmentId);
     public void fillMedicalReport(String doctorsId, MedicalHistory medicalInfo)  throws DoctorCollectionException;
     public void updateMedicalHistory(String doctorsId, String patientsId, MedicalHistory medicalInfo) throws DoctorCollectionException;
+    public List<Doctor> viewAvailableDoctors();
 }

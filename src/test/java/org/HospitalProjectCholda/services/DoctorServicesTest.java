@@ -38,6 +38,9 @@ class DoctorServicesTest {
     public void testThatYouCanRegisterDoctor() {
 
         assertEquals(1,doctorServices.countAllDoctors());
+
+
+
     }
     @Test
     public void testDoctorCanLogin_Successfully() {

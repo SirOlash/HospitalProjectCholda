@@ -2,14 +2,8 @@ package org.HospitalProjectCholda.services.appointmentservice;
 
 
 import AppointmentStatus.AppointmentStatus;
-import jakarta.validation.ConstraintViolationException;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
-import org.HospitalProjectCholda.data.models.Patient;
 import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
@@ -17,14 +11,11 @@ import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
 import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class AppointmentServices implements IAppointmentActivities{
@@ -39,7 +30,7 @@ public class AppointmentServices implements IAppointmentActivities{
     @Override
     public Appointment createAppointment(AppointmentRequest request) {
         Doctor foundDoctor = doctorRepository.findByEmail(request.getDoctorEmail())
-                .orElseThrow(() ->new RuntimeException("Doctor not found"));
+                .orElseThrow(() ->new RuntimeException("Doctor does not exist"));
 
         if (!foundDoctor.isAvailable()){
             throw new DoctorCollectionException(DoctorCollectionException.DoctorNotFound("Doctor not found"));
@@ -102,5 +93,9 @@ public class AppointmentServices implements IAppointmentActivities{
 
     public String getPatientId(String appointmentId) {
         return appointmentRepository.findById(appointmentId).get().getPatient().getId();
+    }
+
+    public List<Doctor> getAvailableDoctors() {
+        return doctorRepository.getDoctorsByAvailable(true);
     }
 }
