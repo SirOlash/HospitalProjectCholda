@@ -1,4 +1,4 @@
-package org.example.services;
+package org.HospitalProjectCholda.services;
 
 public class AppointmentServices {
 }
