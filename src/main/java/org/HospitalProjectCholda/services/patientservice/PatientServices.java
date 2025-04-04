@@ -141,7 +141,7 @@ public class PatientServices implements IPatientActivities {
 
     @Override
     public Appointment bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException {
-        Patient existingPatient = patientRepository.findById(appointmentRequest.getPatient().getId())
+        patientRepository.findById(appointmentRequest.getPatient().getId())
                 .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(appointmentRequest.getPatient().getId())));
         return appointmentServices.createAppointment(appointmentRequest);
 
@@ -155,6 +155,8 @@ public class PatientServices implements IPatientActivities {
     public List<Doctor> viewAvailableDoctors(){
         return  doctorRepository.getDoctorsByAvailable(true);
     }
+
+
 
 
 

@@ -16,6 +16,5 @@ public interface DoctorRepository extends MongoRepository<Doctor, String> {
 
     String id(String id);
 
-
     List<Doctor> getDoctorsByAvailable(boolean available);
 }

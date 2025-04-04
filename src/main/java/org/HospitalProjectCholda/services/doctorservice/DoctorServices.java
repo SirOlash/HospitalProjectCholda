@@ -197,6 +197,11 @@ public class DoctorServices implements IDoctorActivities {
 
     }
 
+    @Override
+    public List<Doctor> viewAvailableDoctors(){
+        return doctorRepository.getDoctorsByAvailable(true);
+    }
+
 }
 
 
