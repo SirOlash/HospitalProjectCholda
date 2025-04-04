@@ -9,6 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.List;
@@ -37,6 +38,10 @@ public class Patient {
 
     @NotNull
     private  String encryptedPassword;
+
+    public void addMedicalHistory(LocalDateTime recordDate, String description, String treatment) {
+        this.medicalHistory.add(new MedicalHistory(recordDate, description, treatment));
+    }
 
 
 }

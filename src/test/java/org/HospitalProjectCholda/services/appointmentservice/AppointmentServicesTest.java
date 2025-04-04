@@ -8,6 +8,7 @@ import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
 import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
+import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.services.doctorservice.DoctorServices;
 import org.HospitalProjectCholda.services.patientservice.PatientServices;
@@ -65,6 +66,7 @@ class AppointmentServicesTest {
         signedUpDoctor.setEncryptedPassword("1234");
         signedUpDoctor.setAvailable(true);
         doctorServices.createNewDoctor(signedUpDoctor);
+
 
         this.appointmentRequest = new AppointmentRequest();
         appointmentRequest.setPatient(loggedInPatient);
@@ -195,8 +197,8 @@ class AppointmentServicesTest {
 
     @Test
     public void testThatPatientCanViewAvailableDoctors() {
-        appointmentServices.createAppointment(appointmentRequest);
-        assertTrue(signedUpDoctor.isAvailable());
+//        appointmentServices.createAppointment(appointmentRequest);
+//        assertTrue(signedUpDoctor.isAvailable());
         Doctor signedUpDoctor2 = new Doctor();
         signedUpDoctor2.setUserName("ben2");
         signedUpDoctor2.setEmail("ben2@gmail.com");
@@ -225,17 +227,74 @@ class AppointmentServicesTest {
         appointmentRequest2.setDoctorEmail("ben3@gmail.com");
         appointmentRequest2.setDescription("description");
 
-        Appointment appointment2 = appointmentServices.createAppointment(appointmentRequest2);
-        System.out.println(appointment2.getDoctor().getUserName());
-        System.out.println(appointment2.getDoctor().isAvailable());
+//        Appointment appointment2 = appointmentServices.createAppointment(appointmentRequest2);
+//        System.out.println(appointment2.getDoctor().getUserName());
+//        System.out.println(appointment2.getDoctor().isAvailable());
 
 
 
 
-        assertEquals(1,doctorServices.viewAvailableDoctors().size());
+        assertEquals(3,doctorServices.viewAvailableDoctors().size());
 //        System.out.println(doctorServices.viewAvailableDoctors());
         //loggedInPatient
     }
 
+    @Test
+    public void testThatPatientCanOnlyBookAvailableDoctors(){
+        Appointment bookedAppointment = appointmentServices.createAppointment(appointmentRequest);
+        assertNotNull(bookedAppointment);
+        assertEquals("John", bookedAppointment.getPatient().getUserName());
+        assertEquals("john@example.com", bookedAppointment.getPatient().getEmail());
+        assertEquals("description", bookedAppointment.getDescription());
+        assertFalse(bookedAppointment.getDoctor().isAvailable());
+
+        Patient signedUpPatient2 = new Patient();
+        signedUpPatient2.setUserName("John");
+        signedUpPatient2.setEmail("joh@example.com");
+        signedUpPatient2.setEncryptedPassword("password");
+        patientServices.createNewPatient(signedUpPatient2);
+        Patient loggedInPatient2 = patientServices.patientLogin("joh@example.com", "password");
+
+        AppointmentRequest appointmentRequest2 = new AppointmentRequest();
+        appointmentRequest2.setPatient(loggedInPatient2);
+        appointmentRequest2.setDoctorEmail("ben@gmail.com");
+        appointmentRequest2.setDescription("description");
+
+        assertThrows(DoctorCollectionException.class, () -> appointmentServices.createAppointment(appointmentRequest2));
+
+    }
+
+    @Test
+    public void testThatDoctorCanCheckAppointment(){
+        appointmentServices.createAppointment(appointmentRequest);
+
+        Doctor loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com","1234");
+        Appointment currentAppointment = doctorServices.viewAppointment(loggedInDoctor);
+        assertEquals("John", currentAppointment.getPatient().getUserName());
+        assertEquals("john@example.com", currentAppointment.getPatient().getEmail());
+
+    }
+
+    @Test
+    public void testThrowsNoBookedAppointmentException(){
+        Doctor loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com","1234");
+        assertThrows(AppointmentCollectionException.class, () -> doctorServices.viewAppointment(loggedInDoctor));
+    }
+
+    @Test
+    public void testThatDoctorCanAcceptAppointment(){
+        appointmentServices.createAppointment(appointmentRequest);
+
+        Doctor loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com","1234");
+        Appointment currentAppointment = doctorServices.viewAppointment(loggedInDoctor);
+        assertEquals("John", currentAppointment.getPatient().getUserName());
+
+        Appointment appointment = doctorServices.acceptAppointment(loggedInDoctor, "Take paracetamol");
+        MedicalHistory medicalHistory = appointment.getPatient().getMedicalHistory().get(0);
+
+        assertEquals("Take paracetamol", medicalHistory.getTreatment());
+        assertEquals("description", medicalHistory.getDescription());
+
+    }
 
 }

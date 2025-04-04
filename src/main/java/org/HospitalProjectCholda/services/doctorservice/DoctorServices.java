@@ -2,12 +2,14 @@ package org.HospitalProjectCholda.services.doctorservice;
 
 import AppointmentStatus.AppointmentStatus;
 import jakarta.validation.ConstraintViolationException;
+import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.data.models.MedicalHistory;
 import org.HospitalProjectCholda.data.models.Patient;
 import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
+import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
@@ -201,6 +203,32 @@ public class DoctorServices implements IDoctorActivities {
     public List<Doctor> viewAvailableDoctors(){
         return doctorRepository.getDoctorsByAvailable(true);
     }
+
+//    @Override
+    public Appointment viewAppointment(Doctor doctor){
+        Appointment currentAppointment = appointmentRepository.findAppointmentByDoctor_Id(doctor.getId());
+        if (currentAppointment == null){
+            throw new AppointmentCollectionException(AppointmentCollectionException.NoBookedAppointmentException());
+        }
+        return currentAppointment;
+    }
+
+
+    public Appointment acceptAppointment(Doctor doctor,  String treatment) {
+        Appointment currentAppointment = viewAppointment(doctor);
+        Patient currentPatient =  currentAppointment.getPatient();
+
+        currentPatient.addMedicalHistory(currentAppointment.getAppointmentTime(), currentAppointment.getDescription(), treatment);
+
+        patientRepository.save(currentPatient);
+        return appointmentRepository.save(currentAppointment);
+
+    }
+
+//    public void updateMedicalHistory(String treatment){
+//
+//    }
+
 
 }
 

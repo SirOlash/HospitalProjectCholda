@@ -13,4 +13,8 @@ public class AppointmentCollectionException extends RuntimeException{
     public  static String AppointmentNotFoundException(String doctorId, LocalDateTime appointmentTime){
         return "Appointment not found!";
     }
+
+    public static String NoBookedAppointmentException(){
+        return "You have not been booked for an appointment";
+    }
 }

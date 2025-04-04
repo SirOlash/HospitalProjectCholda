@@ -33,7 +33,7 @@ public class AppointmentServices implements IAppointmentActivities{
                 .orElseThrow(() ->new RuntimeException("Doctor does not exist"));
 
         if (!foundDoctor.isAvailable()){
-            throw new DoctorCollectionException(DoctorCollectionException.DoctorNotFound("Doctor not found"));
+            throw new DoctorCollectionException(DoctorCollectionException.DoctorNotFound("Doctor not available"));
         }
 
         Appointment appointment = new Appointment();
@@ -42,6 +42,7 @@ public class AppointmentServices implements IAppointmentActivities{
         appointment.setDescription(request.getDescription());
         appointment.setPatient(request.getPatient());
         foundDoctor.setAvailable(false);
+        doctorRepository.save(foundDoctor);
         return appointmentRepository.save(appointment);
 
 
