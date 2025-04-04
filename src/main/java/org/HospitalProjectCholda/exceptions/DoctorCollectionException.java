@@ -25,4 +25,10 @@ public class DoctorCollectionException extends RuntimeException {
     public static String DoctorNotAvailable(String email) {
         return  "Doctor not available";
     }
+    public static String DoctorDoesNotExistsException(){
+        return "Doctor does not exists!";
+    }
+    public static String AppointmentAcceptancePendingException(){
+        return "You have not accepted your appointment!";
+    }
 }

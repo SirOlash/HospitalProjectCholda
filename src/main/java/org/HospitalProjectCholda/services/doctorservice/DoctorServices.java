@@ -3,14 +3,20 @@ package org.HospitalProjectCholda.services.doctorservice;
 import AppointmentStatus.AppointmentStatus;
 import jakarta.validation.ConstraintViolationException;
 import org.HospitalProjectCholda.data.models.Doctor;
+import org.HospitalProjectCholda.data.models.MedicalHistory;
+import org.HospitalProjectCholda.data.models.Patient;
 import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
+import org.HospitalProjectCholda.data.repositories.PatientRepository;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
+import org.HospitalProjectCholda.services.appointmentservice.AppointmentServices;
+import org.HospitalProjectCholda.services.patientservice.PatientServices;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -25,6 +31,12 @@ public class DoctorServices implements IDoctorActivities {
     private PasswordService passwordService;
     @Autowired
     private AppointmentRepository appointmentRepository;
+    @Autowired
+    private AppointmentServices appointmentServices;
+    @Autowired
+    private PatientServices patientServices;
+    @Autowired
+    private PatientRepository patientRepository;
 
     @Override
     public void createNewDoctor(Doctor doctor) throws ConstraintViolationException,  PatientCollectionException {
@@ -68,9 +80,6 @@ public class DoctorServices implements IDoctorActivities {
         }
         Doctor loggedInDoctor = registeredDoctor.get();
 
-//        if (!loggedInDoctor.getEncryptedPassword().equals(passwordService.hashPassword(password))) {
-//            throw new DoctorCollectionException(DoctorCollectionException.DoctorInvalidEmailOrPassword(loggedInDoctor.getEncryptedPassword()));
-//        }
         if (!passwordService.matchesPassword(password, loggedInDoctor.getEncryptedPassword())){
             throw new DoctorCollectionException(DoctorCollectionException.DoctorInvalidEmailOrPassword(loggedInDoctor.getEncryptedPassword()));
         }
@@ -137,6 +146,55 @@ public class DoctorServices implements IDoctorActivities {
     @Override
     public boolean hasBeenScheduled(Doctor doctor) {
         return appointmentRepository.existsByDoctorAndAppointmentStatus(doctor, AppointmentStatus.SCHEDULED);
+    }
+
+    @Override
+    public boolean isAppointmentAccepted(Doctor doctor, String appointmentId) {
+        Doctor availableDoctor = doctorRepository.findById(doctor.getId()).orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(doctor.getId())));
+        if (!availableDoctor.isAvailable()){
+            return false;
+        }
+        availableDoctor.setAvailable(false);
+        availableDoctor.setHasAcceptedAppointment(true);
+        availableDoctor.setCurrentPatientId(appointmentServices.getPatientId(appointmentId));
+        doctorRepository.save(availableDoctor);
+        return true;
+    }
+
+    @Override
+    public void fillMedicalReport(String doctorId, MedicalHistory medicalInfo) throws DoctorCollectionException {
+        Doctor existingDoctor = doctorRepository.findById(doctorId)
+                .orElseThrow(() -> new DoctorCollectionException("Doctor with id: " + doctorId + " not found!"));
+        if (!existingDoctor.isHasAcceptedAppointment()) {
+            throw new IllegalStateException("Doctor must acknowledge appointment by accepting appointment!");
+        }
+        String patientId = existingDoctor.getCurrentPatientId();
+        if (patientId == null) throw new IllegalStateException("Patient not assigned to doctor!");
+
+        MedicalHistory recordEntries = new MedicalHistory(
+                LocalDateTime.now(),
+                medicalInfo.getDescription(),
+                medicalInfo.getTreatment()
+        );
+        updateMedicalHistory(doctorId, patientId, recordEntries);
+
+
+        existingDoctor.setAvailable(true);
+        existingDoctor.setHasAcceptedAppointment(false);
+        existingDoctor.setCurrentPatientId(null);
+        doctorRepository.save(existingDoctor);
+
+    }
+
+    @Override
+    public void updateMedicalHistory(String doctorId, String patientId, MedicalHistory medicalInfo) throws DoctorCollectionException {
+        Patient foundPatient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new IllegalArgumentException("Patient not found!"));
+
+        foundPatient.getMedicalHistory().add(medicalInfo);
+        patientRepository.save(foundPatient);
+
+
     }
 
 }
