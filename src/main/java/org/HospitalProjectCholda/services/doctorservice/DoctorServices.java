@@ -148,43 +148,43 @@ public class DoctorServices implements IDoctorActivities {
         return appointmentRepository.existsByDoctorAndAppointmentStatus(doctor, AppointmentStatus.SCHEDULED);
     }
 
-    @Override
-    public boolean isAppointmentAccepted(Doctor doctor, String appointmentId) {
-        Doctor availableDoctor = doctorRepository.findById(doctor.getId()).orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(doctor.getId())));
-        if (!availableDoctor.isAvailable()){
-            return false;
-        }
-        availableDoctor.setAvailable(false);
-        availableDoctor.setHasAcceptedAppointment(true);
-        availableDoctor.setCurrentPatientId(appointmentServices.getPatientId(appointmentId));
-        doctorRepository.save(availableDoctor);
-        return true;
-    }
+//    @Override
+//    public boolean isAppointmentAccepted(Doctor doctor, String appointmentId) {
+//        Doctor availableDoctor = doctorRepository.findById(doctor.getId()).orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(doctor.getId())));
+//        if (!availableDoctor.isAvailable()){
+//            return false;
+//        }
+//        availableDoctor.setAvailable(false);
+//        availableDoctor.setHasAcceptedAppointment(true);
+//        availableDoctor.setCurrentPatientId(appointmentServices.getPatientId(appointmentId));
+//        doctorRepository.save(availableDoctor);
+//        return true;
+//    }
 
-    @Override
-    public void fillMedicalReport(String doctorId, MedicalHistory medicalInfo) throws DoctorCollectionException {
-        Doctor existingDoctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new DoctorCollectionException("Doctor with id: " + doctorId + " not found!"));
-        if (!existingDoctor.isHasAcceptedAppointment()) {
-            throw new IllegalStateException("Doctor must acknowledge appointment by accepting appointment!");
-        }
-        String patientId = existingDoctor.getCurrentPatientId();
-        if (patientId == null) throw new IllegalStateException("Patient not assigned to doctor!");
-
-        MedicalHistory recordEntries = new MedicalHistory(
-                LocalDateTime.now(),
-                medicalInfo.getDescription(),
-                medicalInfo.getTreatment()
-        );
-        updateMedicalHistory(doctorId, patientId, recordEntries);
-
-
-        existingDoctor.setAvailable(true);
-        existingDoctor.setHasAcceptedAppointment(false);
-        existingDoctor.setCurrentPatientId(null);
-        doctorRepository.save(existingDoctor);
-
-    }
+//    @Override
+//    public void fillMedicalReport(String doctorId, MedicalHistory medicalInfo) throws DoctorCollectionException {
+//        Doctor existingDoctor = doctorRepository.findById(doctorId)
+//                .orElseThrow(() -> new DoctorCollectionException("Doctor with id: " + doctorId + " not found!"));
+//        if (!existingDoctor.isHasAcceptedAppointment()) {
+//            throw new IllegalStateException("Doctor must acknowledge appointment by accepting appointment!");
+//        }
+//        String patientId = existingDoctor.getCurrentPatientId();
+//        if (patientId == null) throw new IllegalStateException("Patient not assigned to doctor!");
+//
+//        MedicalHistory recordEntries = new MedicalHistory(
+//                LocalDateTime.now(),
+//                medicalInfo.getDescription(),
+//                medicalInfo.getTreatment()
+//        );
+//        updateMedicalHistory(doctorId, patientId, recordEntries);
+//
+//
+//        existingDoctor.setAvailable(true);
+//        existingDoctor.setHasAcceptedAppointment(false);
+//        existingDoctor.setCurrentPatientId(null);
+//        doctorRepository.save(existingDoctor);
+//
+//    }
 
     @Override
     public void updateMedicalHistory(String doctorId, String patientId, MedicalHistory medicalInfo) throws DoctorCollectionException {

@@ -118,80 +118,80 @@ class AppointmentServicesTest {
         assertTrue(availableDoctor.isAvailable());
 
     }
-    @Test
-    public void test_Doctor_Can_Accept_Appointment_Only_When_Booked_And_Is_Available(){
-        Appointment appointment = appointmentServices.createAppointment(appointmentRequest);
-
-        Doctor foundDoctor = doctorRepository.findByEmail("ben@gmail.com")
-                .orElseThrow();
-        assertTrue(foundDoctor.isAvailable());
-
-        boolean acceptAppointment = doctorServices.isAppointmentAccepted(foundDoctor, appointment.getId());
-        assertTrue(acceptAppointment);
-
-        Doctor refreshedDoctor = doctorRepository.findByEmail("ben@gmail.com")
-                .orElseThrow();
-
-        assertFalse(refreshedDoctor.isAvailable());
-        assertTrue(refreshedDoctor.isHasAcceptedAppointment());
-
-    }
-    @Test
-    public void test_Doctor_Cannot_Accept_When_Unavailble(){
-
-        Appointment appointment = appointmentServices.createAppointment(appointmentRequest);
-
-        Doctor foundDoctor = doctorRepository.findByEmail("ben@gmail.com")
-                .orElseThrow();
-        assertTrue(foundDoctor.isAvailable());
-
-        boolean acceptAppointment = doctorServices.isAppointmentAccepted(foundDoctor, appointment.getId());
-        assertTrue(acceptAppointment);
-
-        Doctor refreshedDoctor = doctorRepository.findByEmail("ben@gmail.com")
-                .orElseThrow();
-
-        assertFalse(refreshedDoctor.isAvailable());
-        assertTrue(refreshedDoctor.isHasAcceptedAppointment());
-
-         boolean acceptAppointment2 = doctorServices.isAppointmentAccepted(refreshedDoctor, appointment.getId());
-         assertFalse(acceptAppointment2);
-    }
-    @Test
-    public void test_Doctor_can_Update_Patients_MedicalRecord(){
-        Appointment appointment = appointmentServices.createAppointment(appointmentRequest);
-
-        Doctor foundDoctor = doctorRepository.findByEmail("ben@gmail.com")
-                .orElseThrow();
-        assertTrue(foundDoctor.isAvailable());
-
-        boolean acceptAppointment = doctorServices.isAppointmentAccepted(foundDoctor, appointment.getId());
-        assertTrue(acceptAppointment);
-
-        Doctor refreshedDoctor = doctorRepository.findByEmail("ben@gmail.com")
-                .orElseThrow();
-
-        assertFalse(refreshedDoctor.isAvailable());
-        assertTrue(refreshedDoctor.isHasAcceptedAppointment());
-
-        MedicalHistory medicalHistory = new MedicalHistory(
-                LocalDateTime.now(),
-                "Malaria parasite",
-                "Luma tern 500mg prescribed to patient"
-        );
-        doctorServices.fillMedicalReport(refreshedDoctor.getId(), medicalHistory);
-        Patient patientTreated = patientRepository.findById(appointment.getPatient().getId())
-                .orElseThrow();
-
-        assertFalse(patientTreated.getMedicalHistory().isEmpty());
-
-        MedicalHistory updatedPatientRecord = patientTreated.getMedicalHistory().get(0);
-
-        assertEquals("Malaria parasite", updatedPatientRecord.getDescription());
-        assertEquals("Luma tern 500mg prescribed to patient", updatedPatientRecord.getTreatment());
-
-
-    }
+//    @Test
+//    public void test_Doctor_Can_Accept_Appointment_Only_When_Booked_And_Is_Available(){
+//        Appointment appointment = appointmentServices.createAppointment(appointmentRequest);
+//
+//        Doctor foundDoctor = doctorRepository.findByEmail("ben@gmail.com")
+//                .orElseThrow();
+//        assertTrue(foundDoctor.isAvailable());
+//
+//        boolean acceptAppointment = doctorServices.isAppointmentAccepted(foundDoctor, appointment.getId());
+//        assertTrue(acceptAppointment);
+//
+//        Doctor refreshedDoctor = doctorRepository.findByEmail("ben@gmail.com")
+//                .orElseThrow();
+//
+//        assertFalse(refreshedDoctor.isAvailable());
+//        assertTrue(refreshedDoctor.isHasAcceptedAppointment());
+//
+//    }
+//    @Test
+//    public void test_Doctor_Cannot_Accept_When_Unavailble(){
+//
+//        Appointment appointment = appointmentServices.createAppointment(appointmentRequest);
+//
+//        Doctor foundDoctor = doctorRepository.findByEmail("ben@gmail.com")
+//                .orElseThrow();
+//        assertTrue(foundDoctor.isAvailable());
+//
+//        boolean acceptAppointment = doctorServices.isAppointmentAccepted(foundDoctor, appointment.getId());
+//        assertTrue(acceptAppointment);
+//
+//        Doctor refreshedDoctor = doctorRepository.findByEmail("ben@gmail.com")
+//                .orElseThrow();
+//
+//        assertFalse(refreshedDoctor.isAvailable());
+//        assertTrue(refreshedDoctor.isHasAcceptedAppointment());
+//
+//         boolean acceptAppointment2 = doctorServices.isAppointmentAccepted(refreshedDoctor, appointment.getId());
+//         assertFalse(acceptAppointment2);
+//    }
+//    @Test
+//    public void test_Doctor_can_Update_Patients_MedicalRecord(){
+//        Appointment appointment = appointmentServices.createAppointment(appointmentRequest);
+//
+//        Doctor foundDoctor = doctorRepository.findByEmail("ben@gmail.com")
+//                .orElseThrow();
+//        assertTrue(foundDoctor.isAvailable());
+//
+//        boolean acceptAppointment = doctorServices.isAppointmentAccepted(foundDoctor, appointment.getId());
+//        assertTrue(acceptAppointment);
+//
+//        Doctor refreshedDoctor = doctorRepository.findByEmail("ben@gmail.com")
+//                .orElseThrow();
+//
+//        assertFalse(refreshedDoctor.isAvailable());
+//        assertTrue(refreshedDoctor.isHasAcceptedAppointment());
+//
+//        MedicalHistory medicalHistory = new MedicalHistory(
+//                LocalDateTime.now(),
+//                "Malaria parasite",
+//                "Luma tern 500mg prescribed to patient"
+//        );
+//        doctorServices.fillMedicalReport(refreshedDoctor.getId(), medicalHistory);
+//        Patient patientTreated = patientRepository.findById(appointment.getPatient().getId())
+//                .orElseThrow();
+//
+//        assertFalse(patientTreated.getMedicalHistory().isEmpty());
+//
+//        MedicalHistory updatedPatientRecord = patientTreated.getMedicalHistory().get(0);
+//
+//        assertEquals("Malaria parasite", updatedPatientRecord.getDescription());
+//        assertEquals("Luma tern 500mg prescribed to patient", updatedPatientRecord.getTreatment());
+//
+//
+//    }
 
     @Test
     public void testThatPatientCanViewAvailableDoctors() {
