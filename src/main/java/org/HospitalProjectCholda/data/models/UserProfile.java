@@ -13,10 +13,4 @@ public class UserProfile {
     private String phoneNumber;
     private String address;
 
-//    public UserProfile(String firstName, String lastName, String phoneNumber, String address) {
-//        this.firstName = firstName;
-//        this.lastName = lastName;
-//        this.phoneNumber = phoneNumber;
-//        this.address = address;
-//    }
 }

@@ -1,8 +1,11 @@
 package org.HospitalProjectCholda.services;
 
 import org.HospitalProjectCholda.data.models.Doctor;
-import org.HospitalProjectCholda.data.models.Patient;
+import org.HospitalProjectCholda.data.repositories.DoctorRepository;
+import org.HospitalProjectCholda.dtorequest.DoctorProfileDetailRequest;
+import org.HospitalProjectCholda.dtorequest.DoctorRegistrationRequest;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
+import org.HospitalProjectCholda.security.PasswordService;
 import org.HospitalProjectCholda.services.doctorservice.DoctorServices;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,19 +18,32 @@ import static org.junit.jupiter.api.Assertions.*;
 @SpringBootTest
 class DoctorServicesTest {
 
+    DoctorRegistrationRequest doctorRequest;
+
+    @Autowired
+    private PasswordService passwordService;
     @Autowired
     private DoctorServices doctorServices;
+    @Autowired
+    private DoctorRepository doctorRepository;
+
+    DoctorProfileDetailRequest doctorProfileDetail;
 
     @BeforeEach
     void setUp() {
         doctorServices.deleteAll();
 
-        Doctor signedUpDoctor = new Doctor();
 
-        signedUpDoctor.setUserName("ben");
-        signedUpDoctor.setEmail("ben@gmail.com");
-        signedUpDoctor.setEncryptedPassword("1234");
-        doctorServices.createNewDoctor(signedUpDoctor);
+        DoctorRegistrationRequest doctorRequest = new DoctorRegistrationRequest();
+
+
+
+        doctorRequest.setUserName("ben");
+        doctorRequest.setEmail("ben@gmail.com");
+        doctorRequest.setPassword("12345");
+        doctorServices.createNewDoctor(doctorRequest);
+
+
 
     }
     @AfterEach
@@ -44,7 +60,7 @@ class DoctorServicesTest {
     }
     @Test
     public void testDoctorCanLogin_Successfully() {
-        Doctor doctor = doctorServices.doctorLogin("ben@gmail.com", "1234");
+        Doctor doctor = doctorServices.doctorLogin("ben@gmail.com", "12345");
 
         assertNotNull(doctor);
         assertEquals("ben@gmail.com",doctor.getEmail());
@@ -61,10 +77,46 @@ class DoctorServicesTest {
     }
     @Test
     public void test_ThrowsInvalidPasswordException() {
-
-        String email = "ben@gmail.com";
-        String password = "1235";
         DoctorCollectionException wrongPassword = assertThrows(DoctorCollectionException.class, () -> doctorServices.doctorLogin("ben@gmail.com", "1235"));
         assertEquals("Invalid email or password", wrongPassword.getMessage());
     }
+//    @Test
+//    public void testDoctorRegistrationProfileCanBeUpdated() {
+//        Doctor currentDoctor = doctorServices.doctorLogin("ben@gmail.com", "12345");
+//
+//        DoctorRegistrationRequest registrationRequest = new DoctorRegistrationRequest();
+//        registrationRequest.setUserName("Stephen");
+//        registrationRequest.setEmail("stephen@example.com");
+//        registrationRequest.setPassword("2020");
+//
+//        doctorServices.updateDoctorProfile(currentDoctor.getId(), registrationRequest);
+//
+//        Doctor updatedDoctor = doctorRepository.findById(currentDoctor.getId())
+//                .orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(currentDoctor.getId())));
+//        assertEquals("Stephen", updatedDoctor.getUserName());
+//        assertEquals("stephen@example.com",  updatedDoctor.getEmail());
+//        assertTrue(passwordService.matchesPassword("2020", updatedDoctor.getEncryptedPassword()));
+//    }
+    @Test
+    public void testPatientProfileDetailCanBeUpdated(){
+        Doctor loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com", "12345");
+        doctorProfileDetail= new DoctorProfileDetailRequest();
+        doctorProfileDetail.setFirstName("Silas");
+        doctorProfileDetail.setLastName("Mina");
+        doctorProfileDetail.setAddress("Sabo-yaba");
+        doctorProfileDetail.setPhoneNumber("08164567890");
+
+        doctorServices.updateDoctorDetailedProfile(loggedInDoctor.getId(), doctorProfileDetail);
+        Doctor updatedDoctor = doctorRepository.findById(loggedInDoctor.getId())
+                .orElseThrow();
+
+        assertNotNull(updatedDoctor.getId());
+        assertEquals("Silas", updatedDoctor.getDoctorProfile().getFirstName());
+        assertEquals("Mina", updatedDoctor.getDoctorProfile().getLastName());
+        assertEquals("08164567890", updatedDoctor.getDoctorProfile().getPhoneNumber());
+        assertEquals("Sabo-yaba", updatedDoctor.getDoctorProfile().getAddress());
+        assertEquals("08164567890", updatedDoctor.getDoctorProfile().getPhoneNumber());
+
+    }
+
 }

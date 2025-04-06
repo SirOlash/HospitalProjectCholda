@@ -1,67 +1,92 @@
 package org.HospitalProjectCholda.services.doctorservice;
 
-import AppointmentStatus.AppointmentStatus;
 import jakarta.validation.ConstraintViolationException;
-import org.HospitalProjectCholda.data.models.Appointment;
-import org.HospitalProjectCholda.data.models.Doctor;
-import org.HospitalProjectCholda.data.models.MedicalHistory;
-import org.HospitalProjectCholda.data.models.Patient;
+import lombok.AllArgsConstructor;
+import org.HospitalProjectCholda.data.models.*;
 import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
+import org.HospitalProjectCholda.dtorequest.AppointmentResponseDTO;
+import org.HospitalProjectCholda.dtorequest.DoctorProfileDetailRequest;
+import org.HospitalProjectCholda.dtorequest.DoctorRegistrationRequest;
+import org.HospitalProjectCholda.dtorequest.PatientProfileDetailRequest;
 import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
 import org.HospitalProjectCholda.services.appointmentservice.AppointmentServices;
 import org.HospitalProjectCholda.services.patientservice.PatientServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-public class DoctorServices implements IDoctorActivities {
 
-    @Autowired
+@Service
+@AllArgsConstructor
+public class DoctorServices implements IDoctorActivities{
+
     private DoctorRepository doctorRepository;
 
-    @Autowired
     private PasswordService passwordService;
-    @Autowired
+
     private AppointmentRepository appointmentRepository;
-    @Autowired
+
     private AppointmentServices appointmentServices;
-    @Autowired
     private PatientServices patientServices;
-    @Autowired
+
     private PatientRepository patientRepository;
 
-    @Override
-    public void createNewDoctor(Doctor doctor) throws ConstraintViolationException,  PatientCollectionException {
+//    @Override
+//    public void updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest doctorProfile) {
+//        Doctor foundDoctor = doctorRepository.findById(id)
+//                .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(id)));
+//
+//        if (foundDoctor.getDoctorProfile() == null){
+//            foundDoctor.setDoctorProfile(new DoctorProfile());
+//        }
+//        DoctorProfile updatedDoctor = foundDoctor.getDoctorProfile();
+//
+//        if (doctorProfile.getFirstName() != null) updatedDoctor.setFirstName(doctorProfile.getFirstName());
+//        if (doctorProfile.getLastName() != null) updatedDoctor.setLastName(doctorProfile.getLastName());
+//        if (doctorProfile.getAddress() != null) updatedDoctor.setAddress(doctorProfile.getAddress());
+//        if (doctorProfile.getPhoneNumber() != null) updatedDoctor.setPhoneNumber(doctorProfile.getPhoneNumber());
+//        doctorRepository.save(foundDoctor);
+//    }
 
-        Optional<Doctor> foundDoctor = doctorRepository.findByEmail(doctor.getEmail());
+    @Override
+    public void updateDoctorDetailedProfile(String id, PatientProfileDetailRequest profile) {
+
+    }
+
+    @Override
+    public void createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException,  PatientCollectionException {
+
+        Optional<Doctor> foundDoctor = doctorRepository.findByEmail(doctorRequest.getEmail());
         if (foundDoctor.isPresent()){
             throw new DoctorCollectionException(DoctorCollectionException.DoctorAlreadyExists());
 
         }
 
-        if (doctor.getUserName() == null || doctor.getUserName().trim().isEmpty()) {
+        if (doctorRequest.getUserName() == null || doctorRequest.getUserName().trim().isEmpty()) {
             throw new ConstraintViolationException("username cannot be empty!", null);
         }
-        if (doctor.getEncryptedPassword() == null || doctor.getEncryptedPassword().trim().isEmpty()) {
+        if (doctorRequest.getPassword() == null || doctorRequest.getPassword().trim().isEmpty()) {
             throw new ConstraintViolationException("password cannot be empty!", null);
         }
-        if (doctor.getEmail() == null || doctor.getEmail().trim().isEmpty()) {
+        if (doctorRequest.getEmail() == null || doctorRequest.getEmail().trim().isEmpty()) {
             throw new ConstraintViolationException("email cannot be empty!", null);
         }
-        doctor.setEncryptedPassword(passwordService.hashPassword(doctor.getEncryptedPassword()));
+        Doctor registeredDoctor = new Doctor();
+        registeredDoctor.setEmail(doctorRequest.getEmail());
+        registeredDoctor.setUserName(doctorRequest.getUserName());
+        registeredDoctor.setAvailable(doctorRequest.isAvailable());
+        registeredDoctor.setEncryptedPassword(passwordService.hashPassword(doctorRequest.getPassword()));
 
 
-        doctorRepository.save(doctor);
+        doctorRepository.save(registeredDoctor);
 
 
     }
@@ -89,7 +114,6 @@ public class DoctorServices implements IDoctorActivities {
         return loggedInDoctor;
 
     }
-
     @Override
     public List<Doctor> getAllDoctors() {
         List<Doctor> allRegisteredDoctor = doctorRepository.findAll();
@@ -112,124 +136,101 @@ public class DoctorServices implements IDoctorActivities {
         }
     }
 
-    @Override
-    public void updateDoctor(String id, Doctor doctor) throws DoctorCollectionException {
-        Optional<Doctor> foundDoctor = doctorRepository.findById(id);
-        Optional<Doctor> foundDoctorWithSameName = doctorRepository.findById(doctor.getId());
-        if (foundDoctor.isPresent()) {
-            if (foundDoctorWithSameName.isPresent() && !foundDoctorWithSameName.get().equals(doctor)) {
-                throw new DoctorCollectionException(DoctorCollectionException.DoctorAlreadyExists());
-
-            }
-            Doctor updatedDoctor = foundDoctor.get();
-            updatedDoctor.setUserName(doctor.getUserName());
-            updatedDoctor.setEmail(doctor.getEmail());
-            updatedDoctor.setEncryptedPassword(doctor.getEncryptedPassword());
-            updatedDoctor.setDoctorProfile(doctor.getDoctorProfile());
-            doctorRepository.save(updatedDoctor);
-        }
-
-        else{
-                throw new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(doctor.getId()));
-            }
-
-        }
-
-    @Override
-    public void updateDoctorAvailability(String doctorsId, boolean isAvailable) throws DoctorCollectionException {
-        Doctor availableDoctor = doctorRepository.findById(doctorsId)
-                .orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(doctorsId)));
-        if(isAvailable && hasBeenScheduled(availableDoctor)) throw new IllegalStateException("Cannot set status while still having a pending appointment!");
-        availableDoctor.setAvailable(isAvailable);
-        doctorRepository.save(availableDoctor);
-
-    }
-
-    @Override
-    public boolean hasBeenScheduled(Doctor doctor) {
-        return appointmentRepository.existsByDoctorAndAppointmentStatus(doctor, AppointmentStatus.SCHEDULED);
-    }
-
-    @Override
-    public boolean isAppointmentAccepted(Doctor doctor, String appointmentId) {
-        Doctor availableDoctor = doctorRepository.findById(doctor.getId()).orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(doctor.getId())));
-        if (!availableDoctor.isAvailable()){
-            return false;
-        }
-        availableDoctor.setAvailable(false);
-        availableDoctor.setHasAcceptedAppointment(true);
-        availableDoctor.setCurrentPatientId(appointmentServices.getPatientId(appointmentId));
-        doctorRepository.save(availableDoctor);
-        return true;
-    }
-
-    @Override
-    public void fillMedicalReport(String doctorId, MedicalHistory medicalInfo) throws DoctorCollectionException {
-        Doctor existingDoctor = doctorRepository.findById(doctorId)
-                .orElseThrow(() -> new DoctorCollectionException("Doctor with id: " + doctorId + " not found!"));
-        if (!existingDoctor.isHasAcceptedAppointment()) {
-            throw new IllegalStateException("Doctor must acknowledge appointment by accepting appointment!");
-        }
-        String patientId = existingDoctor.getCurrentPatientId();
-        if (patientId == null) throw new IllegalStateException("Patient not assigned to doctor!");
-
-        MedicalHistory recordEntries = new MedicalHistory(
-                LocalDateTime.now(),
-                medicalInfo.getDescription(),
-                medicalInfo.getTreatment()
-        );
-        updateMedicalHistory(doctorId, patientId, recordEntries);
-
-
-        existingDoctor.setAvailable(true);
-        existingDoctor.setHasAcceptedAppointment(false);
-        existingDoctor.setCurrentPatientId(null);
-        doctorRepository.save(existingDoctor);
-
-    }
-
-    @Override
-    public void updateMedicalHistory(String doctorId, String patientId, MedicalHistory medicalInfo) throws DoctorCollectionException {
-        Patient foundPatient = patientRepository.findById(patientId)
-                .orElseThrow(() -> new IllegalArgumentException("Patient not found!"));
-
-        foundPatient.getMedicalHistory().add(medicalInfo);
-        patientRepository.save(foundPatient);
-
-
-    }
 
     @Override
     public List<Doctor> viewAvailableDoctors(){
         return doctorRepository.getDoctorsByAvailable(true);
     }
 
-//    @Override
-    public Appointment viewAppointment(Doctor doctor){
-        Appointment currentAppointment = appointmentRepository.findAppointmentByDoctor_Id(doctor.getId());
-        if (currentAppointment == null){
-            throw new AppointmentCollectionException(AppointmentCollectionException.NoBookedAppointmentException());
+    @Override
+    public AppointmentResponseDTO viewAppointment(String doctorEmail){
+        Doctor doctor = doctorRepository.findByEmail(doctorEmail)
+                .orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(doctorEmail)));
+        Appointment currentAppointment = appointmentRepository.findAppointmentByDoctor_Id(doctor.getId())
+                .orElseThrow(() -> new AppointmentCollectionException(AppointmentCollectionException.NoBookedAppointmentException()));
+
+        return convertToAppointmentResponseDTO(currentAppointment);
+    }
+    @Override
+    public  AppointmentResponseDTO convertToAppointmentResponseDTO(Appointment appointment){
+        AppointmentResponseDTO appointmentResponse = new AppointmentResponseDTO();
+        appointmentResponse.setAppointmentId(appointment.getId());
+        appointmentResponse.setAppointmentTime(LocalDate.from(appointment.getAppointmentTime()));
+        appointmentResponse.setDoctorEmail(appointment.getDoctor().getEmail());
+        appointmentResponse.setDescription(appointment.getDescription());
+        return appointmentResponse;
+
+    }
+    public Appointment acceptAppointment(String doctorEmail, String treatment) {
+        Doctor doctor = doctorRepository.findByEmail(doctorEmail)
+                .orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(doctorEmail)));
+
+        Appointment appointment = appointmentRepository.findAppointmentByDoctor_Id(doctor.getId())
+                .orElseThrow(() -> new AppointmentCollectionException(AppointmentCollectionException.NoBookedAppointmentException()));
+
+        // 2. Update medical history
+        Patient patient = appointment.getPatient();
+        patient.addMedicalHistory(
+                appointment.getAppointmentTime(),
+                appointment.getDescription(),
+                treatment
+        );
+
+
+
+        // 4. Update doctor availability
+        Doctor foundDoctor = appointment.getDoctor();
+        foundDoctor.setAvailable(true);
+
+        // 5. Save changes
+        patientRepository.save(patient);
+        doctorRepository.save(foundDoctor);
+        return appointmentRepository.save(appointment);
+    }
+    @Override
+    public void updateDoctorProfile(String currentDoctorId, DoctorRegistrationRequest newDoctorProfile) {
+        Doctor foundDoctor = doctorRepository.findById(currentDoctorId)
+                .orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(currentDoctorId)));
+
+        if (newDoctorProfile.getUserName() != null && !newDoctorProfile.getUserName().trim().isEmpty()) {
+            foundDoctor.setUserName(newDoctorProfile.getUserName());
         }
-        return currentAppointment;
+        if (newDoctorProfile.getPassword() != null && !newDoctorProfile.getPassword().trim().isEmpty()) {
+            foundDoctor.setEncryptedPassword(passwordService.hashPassword(newDoctorProfile.getPassword()));
+        }
+        if (newDoctorProfile.getEmail() != null && !newDoctorProfile.getEmail().trim().isEmpty()) {
+            if (!newDoctorProfile.getEmail().trim().equals(foundDoctor.getEmail())) {
+                doctorRepository.findByEmail(newDoctorProfile.getEmail())
+                        .ifPresent(patient -> {
+                            throw new DoctorCollectionException(DoctorCollectionException.DoctorAlreadyExists());
+                        });
+                foundDoctor.setEmail(newDoctorProfile.getEmail());
+            }
+        }
+        doctorRepository.save(foundDoctor);
+
     }
 
 
-    public Appointment acceptAppointment(Doctor doctor,  String treatment) {
-        Appointment currentAppointment = viewAppointment(doctor);
-        Patient currentPatient =  currentAppointment.getPatient();
 
-        currentPatient.addMedicalHistory(currentAppointment.getAppointmentTime(), currentAppointment.getDescription(), treatment);
+    @Override
+    public void updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest profile) {
+        Doctor foundDoctor = doctorRepository.findById(id)
+                .orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(id)));
 
-        patientRepository.save(currentPatient);
-        return appointmentRepository.save(currentAppointment);
+        if (foundDoctor.getDoctorProfile() == null){
+            foundDoctor.setDoctorProfile(new DoctorProfile());
+        }
+        DoctorProfile doctorProfile = foundDoctor.getDoctorProfile();
 
+        if (profile.getFirstName() != null) doctorProfile.setFirstName(profile.getFirstName());
+        if (profile.getLastName() != null) doctorProfile.setLastName(profile.getLastName());
+        if (profile.getAddress() != null) doctorProfile.setAddress(profile.getAddress());
+        if (profile.getPhoneNumber() != null) doctorProfile.setPhoneNumber(profile.getPhoneNumber());
+        doctorRepository.save(foundDoctor);
     }
 
-//    public void updateMedicalHistory(String treatment){
-//
-//    }
 
 
 }
-
 

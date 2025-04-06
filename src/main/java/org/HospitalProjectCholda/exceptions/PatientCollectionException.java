@@ -24,4 +24,7 @@ public class PatientCollectionException extends RuntimeException {
     public static String PatientWithEmailNotFound(String email) {
         return "Patient with email: " + email + " not found";
     }
+    public static String EmailAlreadyExists(String email) {
+        return "Email " + email + " already exists";
+    }
 }

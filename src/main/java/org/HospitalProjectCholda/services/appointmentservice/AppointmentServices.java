@@ -46,33 +46,7 @@ public class AppointmentServices implements IAppointmentActivities{
         return appointmentRepository.save(appointment);
 
 
-//    @Override
-//    public boolean isDoctorAvailable(String doctorEmail, LocalDateTime appointmentTime) {
-//        List<Appointment> appointments = appointmentRepository.findByDoctorEmailAndAppointmentTime(doctorEmail, appointmentTime);
-//        return appointments.isEmpty();
-//Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//    }
-//
-//    @Override
-//    public boolean checkPatientCanBookAppointment(String patientId, String doctorEmail) {
-//        List<Appointment> appointments = appointmentRepository.findByPatientIdAndDoctorEmailAndAppointmentStatus(patientId, doctorEmail, AppointmentStatus.SCHEDULED);
-//        return appointments.isEmpty();
-//
-//    }
-//
-//    @Override
-//    public Appointment createAppointment(Appointment appointment) {
-//        if (!isDoctorAvailable(appointment.getDoctorEmail(), appointment.getAppointmentTime())) {
-//            throw new AppointmentCollectionException(AppointmentCollectionException.DoctorIsUnavailable(appointment.getDoctorEmail(), appointment.getAppointmentTime()));
-//        }
-//        if (!checkPatientCanBookAppointment(appointment.getPatient().getId(), appointment.getDoctorEmail())) {
-//            throw new ConstraintViolationException("Patient has already scheduled an appointment with doctor!", null);
-//        }
-//        appointment.setCreatedAt(LocalDateTime.now());
-//        appointment.setAppointmentStatus(AppointmentStatus.SCHEDULED);
-//        return appointmentRepository.save(appointment);
-//    }
-//
+
     }
 
     @Override
@@ -83,7 +57,6 @@ public class AppointmentServices implements IAppointmentActivities{
         appointments.setAppointmentStatus(AppointmentStatus.COMPLETED);
         appointmentRepository.save(appointments);
 
-//        notificationService.sendToDoctor(appointments.getDoctor().getId(), "Appointment completed. Update your availability!");
 
         return appointments;
     }

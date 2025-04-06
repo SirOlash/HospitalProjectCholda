@@ -2,69 +2,67 @@ package org.HospitalProjectCholda.services.patientservice;
 
 import jakarta.validation.ConstraintViolationException;
 import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.HospitalProjectCholda.data.models.Appointment;
-import org.HospitalProjectCholda.data.models.Doctor;
-import org.HospitalProjectCholda.data.models.Patient;
+import org.HospitalProjectCholda.data.models.*;
 import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
-import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
+import org.HospitalProjectCholda.dtorequest.*;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
 import org.HospitalProjectCholda.services.appointmentservice.AppointmentServices;
-import org.HospitalProjectCholda.services.doctorservice.DoctorServices;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
+@AllArgsConstructor
 public class PatientServices implements IPatientActivities {
-    @Autowired
-    private PatientRepository patientRepository;
 
-    @Autowired
+    private final PatientRepository patientRepository;
+
+
     private PasswordService passwordService;
-    @Autowired
+
+
     private AppointmentServices appointmentServices;
 
-    @Autowired
+
     private AppointmentRepository appointmentRepository;
 
-    @Autowired
     private DoctorRepository doctorRepository;
 
+
+
     @Override
-    public void createNewPatient(Patient patient) throws ConstraintViolationException, PatientCollectionException {
-        //check if it exists first
-        Optional<Patient> foundPatient = patientRepository.findByEmail(patient.getEmail());
+    public PatientRegistrationRequest createNewPatient(PatientRegistrationRequest request)
+            throws ConstraintViolationException, PatientCollectionException {
+
+        Optional<Patient> foundPatient = patientRepository.findByEmail(request.getEmail());
         if (foundPatient.isPresent()){
             throw new PatientCollectionException(PatientCollectionException.PatientAlreadyExists());
 
         }
 
-        if (patient.getUserName() == null || patient.getUserName().isEmpty()) {
-                throw new ConstraintViolationException("username cannot be empty!", null);
+        if (request.getUserName() == null || request.getUserName().trim().isEmpty()) {
+            throw new ConstraintViolationException("username cannot be empty!", null);
         }
-        if (patient.getEncryptedPassword() == null || patient.getEncryptedPassword().isEmpty()) {
+        if (request.getPassword() == null || request.getPassword().trim().isEmpty()) {
             throw new ConstraintViolationException("password cannot be empty!", null);
         }
-        if (patient.getEmail() == null || patient.getEmail().isEmpty()) {
+        if (request.getEmail() == null || request.getEmail().trim().isEmpty()) {
             throw new ConstraintViolationException("email cannot be empty!", null);
         }
-        if (patient.getMedicalHistory() == null) {
-            patient.setMedicalHistory(new ArrayList<>());
-        }
-        patient.setEncryptedPassword(passwordService.hashPassword(patient.getEncryptedPassword()));
-        patientRepository.save(patient);
+        Patient registeredPatient = new Patient();
+        registeredPatient.setEmail(request.getEmail());
+        registeredPatient.setUserName(request.getUserName());
+        registeredPatient.setEncryptedPassword(passwordService.hashPassword(request.getPassword()));
 
+
+        patientRepository.save(registeredPatient);
+
+        return request;
     }
-
     @Override
     public List<Patient> getAllPatients() {
         List<Patient> allPatient = patientRepository.findAll();
@@ -89,31 +87,7 @@ public class PatientServices implements IPatientActivities {
 
     }
 
-    @Override
-    public void updatePatient(String id, Patient patient) throws PatientCollectionException {
-        Optional<Patient> foundPatient = patientRepository.findById(id);
-        Optional<Patient> foundPatientWithSameName = patientRepository.findByEmail(patient.getEmail());
-        if (foundPatient.isPresent()){
-            if (foundPatientWithSameName.isPresent() && !foundPatientWithSameName.get().equals(patient)){
-                throw new PatientCollectionException(PatientCollectionException.PatientAlreadyExists());
 
-            }
-            Patient updatedPatient = foundPatient.get();
-            updatedPatient.setPatientProfile(patient.getPatientProfile());
-            updatedPatient.setUserName(patient.getUserName());
-            updatedPatient.setEmail(patient.getEmail());
-
-            if (patient.getEncryptedPassword() != null && !patient.getEncryptedPassword().isEmpty()) {
-                updatedPatient.setEncryptedPassword(passwordService.hashPassword(patient.getEncryptedPassword()));
-            }
-            patientRepository.save(updatedPatient);
-
-        }
-        else{
-            throw new PatientCollectionException(PatientCollectionException.PatientNotFoundException(patient.getId()));
-        }
-
-    }
     @Override
     public long countAllPatients() {
         return patientRepository.count();
@@ -148,13 +122,51 @@ public class PatientServices implements IPatientActivities {
     }
 
     @Override
+    public void updatePatientProfile(String currentPatientId, PatientRegistrationRequest newPatientProfile) {
+        Patient foundPatient = patientRepository.findById(currentPatientId)
+                .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(currentPatientId)));
+
+        if (newPatientProfile.getUserName() != null && !newPatientProfile.getUserName().trim().isEmpty()) {
+            foundPatient.setUserName(newPatientProfile.getUserName());
+        }
+        if (newPatientProfile.getPassword() != null && !newPatientProfile.getPassword().trim().isEmpty()) {
+            foundPatient.setEncryptedPassword(passwordService.hashPassword(newPatientProfile.getPassword()));
+        }
+        if (newPatientProfile.getEmail() != null && !newPatientProfile.getEmail().trim().isEmpty()) {
+            if (!newPatientProfile.getEmail().trim().equals(foundPatient.getEmail())) {
+                patientRepository.findByEmail(newPatientProfile.getEmail())
+                        .ifPresent(patient -> {
+                            throw new PatientCollectionException(PatientCollectionException.EmailAlreadyExists("Email already exists"));
+                        });
+                foundPatient.setEmail(newPatientProfile.getEmail());
+            }
+        }
+        patientRepository.save(foundPatient);
+
+    }
+
+    @Override
     public void deleteAll() {
         patientRepository.deleteAll();
     }
 
+    @Override
+    public void updatePatientDetailedProfile(String id, PatientProfileDetailRequest profile) {
+        Patient foundPatient = patientRepository.findById(id)
+                .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(id)));
 
+        if (foundPatient.getPatientProfile() == null){
+            foundPatient.setPatientProfile(new PatientProfile());
+        }
+        PatientProfile patientProfile = foundPatient.getPatientProfile();
 
-
-
+        if (profile.getFirstName() != null) patientProfile.setFirstName(profile.getFirstName());
+        if (profile.getLastName() != null) patientProfile.setLastName(profile.getLastName());
+        if (profile.getDateOfBirth() != null) patientProfile.setDateOfBirth(profile.getDateOfBirth());
+        if (profile.getAddress() != null) patientProfile.setAddress(profile.getAddress());
+        if (profile.getPhoneNumber() != null) patientProfile.setPhoneNumber(profile.getPhoneNumber());
+        if (profile.getGender() != null) patientProfile.setGender(profile.getGender());
+        patientRepository.save(foundPatient);
+    }
 }
 

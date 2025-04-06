@@ -11,6 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -24,7 +25,7 @@ import java.util.List;
 public class Patient {
     @Id
     private String id;;
-    @DBRef
+
     private PatientProfile patientProfile;
 
     @NotNull(message = "Username cannot be empty!")
@@ -33,8 +34,7 @@ public class Patient {
     @NotNull(message = "email cannot be empty!")
     private String email;
 
-    @DBRef
-    private List<MedicalHistory> medicalHistory;
+    private List<MedicalHistory> medicalHistory = new ArrayList<>();
 
     @NotNull
     private  String encryptedPassword;

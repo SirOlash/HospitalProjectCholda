@@ -15,7 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Doctor {
     @Id
     private String id;
-    @DBRef
+
     private DoctorProfile doctorProfile;
 
     @NotNull(message = "username cannot be empty!")

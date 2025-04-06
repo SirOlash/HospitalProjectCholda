@@ -1,25 +1,54 @@
+
 package org.HospitalProjectCholda.services.doctorservice;
 
 import jakarta.validation.ConstraintViolationException;
+import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
-import org.HospitalProjectCholda.data.models.MedicalHistory;
+import org.HospitalProjectCholda.dtorequest.*;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
-import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 
 import java.util.List;
 
 public interface IDoctorActivities {
-    public void createNewDoctor(Doctor doctor) throws ConstraintViolationException, DoctorCollectionException;
+
+    //    @Override
+    //    public void updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest doctorProfile) {
+    //        Doctor foundDoctor = doctorRepository.findById(id)
+    //                .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(id)));
+    //
+    //        if (foundDoctor.getDoctorProfile() == null){
+    //            foundDoctor.setDoctorProfile(new DoctorProfile());
+    //        }
+    //        DoctorProfile updatedDoctor = foundDoctor.getDoctorProfile();
+    //
+    //        if (doctorProfile.getFirstName() != null) updatedDoctor.setFirstName(doctorProfile.getFirstName());
+    //        if (doctorProfile.getLastName() != null) updatedDoctor.setLastName(doctorProfile.getLastName());
+    //        if (doctorProfile.getAddress() != null) updatedDoctor.setAddress(doctorProfile.getAddress());
+    //        if (doctorProfile.getPhoneNumber() != null) updatedDoctor.setPhoneNumber(doctorProfile.getPhoneNumber());
+    //        doctorRepository.save(foundDoctor);
+    //    }
+    void updateDoctorDetailedProfile(String id, PatientProfileDetailRequest profile);
+
+    public void createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException, DoctorCollectionException;
+
     public long countAllDoctors();
+
     public void deleteAll();
+
     public Doctor doctorLogin(String email, String password) throws DoctorCollectionException;
+
     public List<Doctor> getAllDoctors();
+
     public Doctor getSpecificDoctor(String doctorsId) throws DoctorCollectionException;
-    public void updateDoctor(String doctorsId, Doctor doctor) throws DoctorCollectionException;
-    public void updateDoctorAvailability(String doctorsId, boolean available) throws DoctorCollectionException;
-    public boolean hasBeenScheduled(Doctor doctor);
-    public boolean isAppointmentAccepted(Doctor doctor, String appointmentId);
-    public void fillMedicalReport(String doctorsId, MedicalHistory medicalInfo)  throws DoctorCollectionException;
-    public void updateMedicalHistory(String doctorsId, String patientsId, MedicalHistory medicalInfo) throws DoctorCollectionException;
+
     public List<Doctor> viewAvailableDoctors();
+
+    public AppointmentResponseDTO viewAppointment(String doctorEmail);
+
+    public AppointmentResponseDTO convertToAppointmentResponseDTO(Appointment appointment);
+
+    public void updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest profile);
+
+    public void updateDoctorProfile(String currentDoctorId, DoctorRegistrationRequest newDoctorProfile);
 }
+

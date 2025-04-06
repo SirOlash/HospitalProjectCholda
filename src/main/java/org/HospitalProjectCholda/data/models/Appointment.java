@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -29,6 +30,7 @@ public class Appointment {
     private Patient patient;
 
     @DBRef
+    @Indexed
     private Doctor doctor;
 
     @NotNull(message =  "Doctor's email cannot be empty!")
@@ -36,6 +38,8 @@ public class Appointment {
     private String description;
     private AppointmentStatus appointmentStatus;
     private LocalDateTime createdAt;
+
+
 //    private LocalDateTime updatedAt;
 
 }

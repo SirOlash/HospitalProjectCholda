@@ -12,13 +12,11 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-@AllArgsConstructor
+
 @NoArgsConstructor
 @Data
 @Document(collection = "Medical History")
 public class MedicalHistory {
-    @Id
-    private String id;
 
     @NotNull(message = "medical record date cannot be empty!")
     private LocalDateTime recordDate;
