@@ -24,5 +24,7 @@ public class DoctorRegistrationRequest {
     @NotBlank(message = "Password cannot be empty!")
     private String password;
 
-    private boolean available;
+    private boolean available = true;
+
+
 }

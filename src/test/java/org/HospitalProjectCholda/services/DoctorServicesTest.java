@@ -4,6 +4,7 @@ import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.dtorequest.DoctorProfileDetailRequest;
 import org.HospitalProjectCholda.dtorequest.DoctorRegistrationRequest;
+import org.HospitalProjectCholda.dtorequest.DoctorResponseDTO;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
 import org.HospitalProjectCholda.services.doctorservice.DoctorServices;
@@ -45,6 +46,7 @@ class DoctorServicesTest {
 
 
 
+
     }
     @AfterEach
     void tearDown() {
@@ -60,7 +62,7 @@ class DoctorServicesTest {
     }
     @Test
     public void testDoctorCanLogin_Successfully() {
-        Doctor doctor = doctorServices.doctorLogin("ben@gmail.com", "12345");
+        DoctorResponseDTO doctor = doctorServices.doctorLogin("ben@gmail.com", "12345");
 
         assertNotNull(doctor);
         assertEquals("ben@gmail.com",doctor.getEmail());
@@ -99,7 +101,7 @@ class DoctorServicesTest {
 //    }
     @Test
     public void testPatientProfileDetailCanBeUpdated(){
-        Doctor loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com", "12345");
+        DoctorResponseDTO loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com", "12345");
         doctorProfileDetail= new DoctorProfileDetailRequest();
         doctorProfileDetail.setFirstName("Silas");
         doctorProfileDetail.setLastName("Mina");

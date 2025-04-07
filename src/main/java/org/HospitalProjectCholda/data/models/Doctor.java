@@ -25,7 +25,7 @@ public class Doctor {
     private String email;
 
     @Setter
-    private boolean available = true;
+    private boolean isAvailable = true;
 
     @NotNull(message = "password cannot be empty!")
     private String encryptedPassword;

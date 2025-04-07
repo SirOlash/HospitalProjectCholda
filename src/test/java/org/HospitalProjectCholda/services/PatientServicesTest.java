@@ -7,6 +7,7 @@ import org.HospitalProjectCholda.data.models.PatientProfile;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
 import org.HospitalProjectCholda.dtorequest.PatientProfileDetailRequest;
 import org.HospitalProjectCholda.dtorequest.PatientRegistrationRequest;
+import org.HospitalProjectCholda.dtorequest.PatientResponseDTO;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
 import org.HospitalProjectCholda.services.patientservice.PatientServices;

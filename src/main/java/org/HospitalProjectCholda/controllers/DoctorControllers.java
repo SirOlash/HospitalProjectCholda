@@ -6,6 +6,7 @@ import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.data.models.Patient;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.dtorequest.DoctorRegistrationRequest;
+import org.HospitalProjectCholda.dtorequest.DoctorResponseDTO;
 import org.HospitalProjectCholda.dtorequest.LoginRequest;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
@@ -59,24 +60,11 @@ public class DoctorControllers {
         }
 
     }
-//    @PutMapping("/doctor{doctorsId}/")
-//    public ResponseEntity<?> updateDoctor(@PathVariable String doctorsId, @RequestBody Doctor doctor) {
-//        try{
-//            doctorServices.updateDoctor(doctorsId,doctor);
-//            return new ResponseEntity<>("Doctor with id " + doctorsId + " updated successfully", HttpStatus.OK);
-//        }
-//        catch(ConstraintViolationException e){
-//            return new ResponseEntity<>(e.getMessage(),HttpStatus.UNPROCESSABLE_ENTITY);
-//        }
-//        catch(DoctorCollectionException e){
-//            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
-//        }
-//
-//    }
+
     @PostMapping("/doctorLogin")
     public ResponseEntity<?> doctorLogin(@RequestBody LoginRequest loginRequest) {
         try{
-            Doctor existingDoctor = doctorServices.doctorLogin(loginRequest.getEmail(), loginRequest.getPassword());
+            DoctorResponseDTO existingDoctor = doctorServices.doctorLogin(loginRequest.getEmail(), loginRequest.getPassword());
             return new ResponseEntity<>(existingDoctor, HttpStatus.OK);
         }
         catch (DoctorCollectionException e){

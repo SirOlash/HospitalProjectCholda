@@ -10,7 +10,6 @@ import org.HospitalProjectCholda.dtorequest.*;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
 import org.HospitalProjectCholda.services.appointmentservice.AppointmentServices;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -114,7 +113,7 @@ public class PatientServices implements IPatientActivities {
     }
 
     @Override
-    public Appointment bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException {
+    public AppointmentResponseDTO bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException {
         patientRepository.findById(appointmentRequest.getPatient().getId())
                 .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(appointmentRequest.getPatient().getId())));
         return appointmentServices.createAppointment(appointmentRequest);

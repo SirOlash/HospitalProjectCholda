@@ -29,13 +29,13 @@ public interface IDoctorActivities {
     //    }
     void updateDoctorDetailedProfile(String id, PatientProfileDetailRequest profile);
 
-    public void createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException, DoctorCollectionException;
+    public Doctor createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException, DoctorCollectionException;
 
     public long countAllDoctors();
 
     public void deleteAll();
 
-    public Doctor doctorLogin(String email, String password) throws DoctorCollectionException;
+    public DoctorResponseDTO doctorLogin(String email, String password)  throws DoctorCollectionException;
 
     public List<Doctor> getAllDoctors();
 

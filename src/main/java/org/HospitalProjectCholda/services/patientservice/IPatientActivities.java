@@ -1,11 +1,8 @@
 package org.HospitalProjectCholda.services.patientservice;
 
 import jakarta.validation.ConstraintViolationException;
-import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Patient;
-import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
-import org.HospitalProjectCholda.dtorequest.PatientProfileDetailRequest;
-import org.HospitalProjectCholda.dtorequest.PatientRegistrationRequest;
+import org.HospitalProjectCholda.dtorequest.*;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 
 import java.util.List;
@@ -20,7 +17,7 @@ public interface IPatientActivities {
     public long countAllPatients();
     public Patient patientLogin(String email, String password) throws PatientCollectionException;
     public Optional<Patient> findByEmail(String email) throws PatientCollectionException;
-    public Appointment bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException;
+    public AppointmentResponseDTO bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException;
     public void updatePatientProfile(String currentPatientId, PatientRegistrationRequest newPatientProfile);
 
     void updatePatientDetailedProfile(String id, PatientProfileDetailRequest profile);

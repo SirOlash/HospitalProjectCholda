@@ -1,16 +1,10 @@
 package org.HospitalProjectCholda.services.appointmentservice;
 
-import org.HospitalProjectCholda.data.models.Appointment;
-import org.HospitalProjectCholda.data.models.Doctor;
-import org.HospitalProjectCholda.data.models.MedicalHistory;
-import org.HospitalProjectCholda.data.models.Patient;
+import org.HospitalProjectCholda.data.models.*;
 import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
-import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
-import org.HospitalProjectCholda.dtorequest.AppointmentResponseDTO;
-import org.HospitalProjectCholda.dtorequest.DoctorRegistrationRequest;
-import org.HospitalProjectCholda.dtorequest.PatientRegistrationRequest;
+import org.HospitalProjectCholda.dtorequest.*;
 import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
@@ -72,6 +66,14 @@ class AppointmentServicesTest {
         patientServices.createNewPatient(patientRegistrationRequest);
         Patient loggedInPatient = patientServices.patientLogin("john@example.com", "password");
 
+        if (loggedInPatient.getPatientProfile() != null) {
+            PatientProfile patientProfile = new PatientProfile();
+            patientProfile.setFirstName("Johnson");
+            patientProfile.setLastName("Friday");
+            loggedInPatient.setPatientProfile(patientProfile);
+            patientRepository.save(loggedInPatient);
+        }
+
         if (loggedInPatient.getMedicalHistory() != null) {
             loggedInPatient.setMedicalHistory(new ArrayList<>());
         }
@@ -86,24 +88,34 @@ class AppointmentServicesTest {
         doctorRequest.setEmail("ben@gmail.com");
         doctorRequest.setPassword("password");
         doctorRequest.setAvailable(true);
-        doctorServices.createNewDoctor(doctorRequest);
+        Doctor craetedDoctor = doctorServices.createNewDoctor(doctorRequest);
+
+        DoctorProfile doctorProfile = new DoctorProfile();
+        doctorProfile.setFirstName("Francis");
+        doctorProfile.setLastName("McLean");
+        craetedDoctor.setDoctorProfile(doctorProfile);
+        doctorRepository.save(craetedDoctor);
+
 
 
         this.appointmentRequest = new AppointmentRequest();
         appointmentRequest.setPatient(loggedInPatient);
         appointmentRequest.setDoctorEmail("ben@gmail.com");
         appointmentRequest.setDescription("description");
+        appointmentRequest.setAppointmentTime(LocalDateTime.of(2020, 6, 1, 3, 20));
 
 
     }
     @Test
     public void test_Patient_Can_Book_Appointment(){
-        Appointment bookedAppointment = appointmentServices.createAppointment(appointmentRequest);
+        AppointmentResponseDTO bookedAppointment = appointmentServices.createAppointment(appointmentRequest);
         System.out.println(bookedAppointment);
         assertNotNull(bookedAppointment);
+        assertEquals("ben@gmail.com", bookedAppointment.getDoctor().getEmail());
         assertEquals("John", bookedAppointment.getPatient().getUserName());
         assertEquals("john@example.com", bookedAppointment.getPatient().getEmail());
         assertEquals("description", bookedAppointment.getDescription());
+        assertEquals(LocalDateTime.of(2020, 6, 1, 3, 20), bookedAppointment.getAppointmentTime());
         assertFalse(bookedAppointment.getDoctor().isAvailable());
 
     }
@@ -168,7 +180,7 @@ class AppointmentServicesTest {
 
     @Test
     public void testThatPatientCanOnlyBookAvailableDoctors(){
-        Appointment bookedAppointment = appointmentServices.createAppointment(appointmentRequest);
+        AppointmentResponseDTO bookedAppointment = appointmentServices.createAppointment(appointmentRequest);
         assertNotNull(bookedAppointment);
         assertEquals("John", bookedAppointment.getPatient().getUserName());
         assertEquals("john@example.com", bookedAppointment.getPatient().getEmail());
@@ -198,9 +210,9 @@ class AppointmentServicesTest {
     @Test
     public void testThatDoctorCanCheckAppointment(){
 
-        Appointment bookedAppointment = appointmentServices.createAppointment(appointmentRequest);
+        AppointmentResponseDTO bookedAppointment = appointmentServices.createAppointment(appointmentRequest);
 
-        Doctor loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com", "password");
+        DoctorResponseDTO loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com", "password");
 
         AppointmentResponseDTO appointment = doctorServices.viewAppointment("ben@gmail.com");
         assertEquals(bookedAppointment.getDoctor().getUserName(), loggedInDoctor.getUserName());
@@ -211,15 +223,15 @@ class AppointmentServicesTest {
 
     @Test
     public void testThrowsNoBookedAppointmentException(){
-        Doctor loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com","password");
+        DoctorResponseDTO loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com","password");
         assertThrows(AppointmentCollectionException.class, () -> doctorServices.viewAppointment("ben@gmail.com"));
     }
 
     @Test
     public void testThatDoctorCanAcceptAppointment(){
 
-        Appointment bookedAppointment = appointmentServices.createAppointment(appointmentRequest);
-        Doctor loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com",  "password");
+        AppointmentResponseDTO bookedAppointment = appointmentServices.createAppointment(appointmentRequest);
+        DoctorResponseDTO loggedInDoctor = doctorServices.doctorLogin("ben@gmail.com",  "password");
         doctorServices.viewAppointment("ben@gmail.com");
         assertEquals(bookedAppointment.getDoctor().getUserName(), loggedInDoctor.getUserName());
         assertEquals(bookedAppointment.getDoctor().getEmail(), loggedInDoctor.getEmail());

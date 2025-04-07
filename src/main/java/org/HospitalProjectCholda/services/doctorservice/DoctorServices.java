@@ -6,10 +6,7 @@ import org.HospitalProjectCholda.data.models.*;
 import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
-import org.HospitalProjectCholda.dtorequest.AppointmentResponseDTO;
-import org.HospitalProjectCholda.dtorequest.DoctorProfileDetailRequest;
-import org.HospitalProjectCholda.dtorequest.DoctorRegistrationRequest;
-import org.HospitalProjectCholda.dtorequest.PatientProfileDetailRequest;
+import org.HospitalProjectCholda.dtorequest.*;
 import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
@@ -18,7 +15,7 @@ import org.HospitalProjectCholda.services.appointmentservice.AppointmentServices
 import org.HospitalProjectCholda.services.patientservice.PatientServices;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -39,22 +36,6 @@ public class DoctorServices implements IDoctorActivities{
 
     private PatientRepository patientRepository;
 
-//    @Override
-//    public void updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest doctorProfile) {
-//        Doctor foundDoctor = doctorRepository.findById(id)
-//                .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(id)));
-//
-//        if (foundDoctor.getDoctorProfile() == null){
-//            foundDoctor.setDoctorProfile(new DoctorProfile());
-//        }
-//        DoctorProfile updatedDoctor = foundDoctor.getDoctorProfile();
-//
-//        if (doctorProfile.getFirstName() != null) updatedDoctor.setFirstName(doctorProfile.getFirstName());
-//        if (doctorProfile.getLastName() != null) updatedDoctor.setLastName(doctorProfile.getLastName());
-//        if (doctorProfile.getAddress() != null) updatedDoctor.setAddress(doctorProfile.getAddress());
-//        if (doctorProfile.getPhoneNumber() != null) updatedDoctor.setPhoneNumber(doctorProfile.getPhoneNumber());
-//        doctorRepository.save(foundDoctor);
-//    }
 
     @Override
     public void updateDoctorDetailedProfile(String id, PatientProfileDetailRequest profile) {
@@ -62,7 +43,7 @@ public class DoctorServices implements IDoctorActivities{
     }
 
     @Override
-    public void createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException,  PatientCollectionException {
+    public Doctor createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException,  PatientCollectionException {
 
         Optional<Doctor> foundDoctor = doctorRepository.findByEmail(doctorRequest.getEmail());
         if (foundDoctor.isPresent()){
@@ -82,13 +63,14 @@ public class DoctorServices implements IDoctorActivities{
         Doctor registeredDoctor = new Doctor();
         registeredDoctor.setEmail(doctorRequest.getEmail());
         registeredDoctor.setUserName(doctorRequest.getUserName());
-        registeredDoctor.setAvailable(doctorRequest.isAvailable());
+        registeredDoctor.setAvailable(true);
         registeredDoctor.setEncryptedPassword(passwordService.hashPassword(doctorRequest.getPassword()));
 
 
         doctorRepository.save(registeredDoctor);
 
 
+        return registeredDoctor;
     }
     @Override
     public long countAllDoctors() {
@@ -100,7 +82,7 @@ public class DoctorServices implements IDoctorActivities{
         doctorRepository.deleteAll();
     }
     @Override
-    public Doctor doctorLogin(String email, String password) {
+    public DoctorResponseDTO doctorLogin(String email, String password) {
         Optional<Doctor> registeredDoctor = doctorRepository.findByEmail(email);
         if (registeredDoctor.isEmpty()) {
             throw new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(email));
@@ -111,7 +93,7 @@ public class DoctorServices implements IDoctorActivities{
             throw new DoctorCollectionException(DoctorCollectionException.DoctorInvalidEmailOrPassword(loggedInDoctor.getEncryptedPassword()));
         }
 
-        return loggedInDoctor;
+        return new DoctorResponseDTO(loggedInDoctor);
 
     }
     @Override
@@ -153,9 +135,9 @@ public class DoctorServices implements IDoctorActivities{
     }
     @Override
     public  AppointmentResponseDTO convertToAppointmentResponseDTO(Appointment appointment){
-        AppointmentResponseDTO appointmentResponse = new AppointmentResponseDTO();
+        AppointmentResponseDTO appointmentResponse = new AppointmentResponseDTO(appointment);
         appointmentResponse.setAppointmentId(appointment.getId());
-        appointmentResponse.setAppointmentTime(LocalDate.from(appointment.getAppointmentTime()));
+        appointmentResponse.setAppointmentTime(LocalDateTime.from(appointment.getAppointmentTime()));
         appointmentResponse.setDoctorEmail(appointment.getDoctor().getEmail());
         appointmentResponse.setDescription(appointment.getDescription());
         return appointmentResponse;
@@ -168,7 +150,6 @@ public class DoctorServices implements IDoctorActivities{
         Appointment appointment = appointmentRepository.findAppointmentByDoctor_Id(doctor.getId())
                 .orElseThrow(() -> new AppointmentCollectionException(AppointmentCollectionException.NoBookedAppointmentException()));
 
-        // 2. Update medical history
         Patient patient = appointment.getPatient();
         patient.addMedicalHistory(
                 appointment.getAppointmentTime(),
@@ -177,12 +158,9 @@ public class DoctorServices implements IDoctorActivities{
         );
 
 
-
-        // 4. Update doctor availability
         Doctor foundDoctor = appointment.getDoctor();
         foundDoctor.setAvailable(true);
 
-        // 5. Save changes
         patientRepository.save(patient);
         doctorRepository.save(foundDoctor);
         return appointmentRepository.save(appointment);

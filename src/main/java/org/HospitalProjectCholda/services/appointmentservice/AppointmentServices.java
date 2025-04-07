@@ -8,6 +8,7 @@ import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
 import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
+import org.HospitalProjectCholda.dtorequest.AppointmentResponseDTO;
 import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,22 +29,23 @@ public class AppointmentServices implements IAppointmentActivities{
     private DoctorRepository doctorRepository;
 
     @Override
-    public Appointment createAppointment(AppointmentRequest request) {
+    public AppointmentResponseDTO createAppointment(AppointmentRequest request) {
         Doctor foundDoctor = doctorRepository.findByEmail(request.getDoctorEmail())
                 .orElseThrow(() ->new RuntimeException("Doctor does not exist"));
 
         if (!foundDoctor.isAvailable()){
-            throw new DoctorCollectionException(DoctorCollectionException.DoctorNotFound("Doctor not available"));
+            throw new DoctorCollectionException("Doctor with email " + request.getDoctorEmail() + " not available");
         }
 
         Appointment appointment = new Appointment();
         appointment.setDoctor(foundDoctor);
-        appointment.setAppointmentTime(LocalDateTime.now());
+        appointment.setAppointmentTime(request.getAppointmentTime());
         appointment.setDescription(request.getDescription());
         appointment.setPatient(request.getPatient());
         foundDoctor.setAvailable(false);
         doctorRepository.save(foundDoctor);
-        return appointmentRepository.save(appointment);
+        appointmentRepository.save(appointment);
+        return new AppointmentResponseDTO(appointment);
 
 
 
@@ -71,5 +73,11 @@ public class AppointmentServices implements IAppointmentActivities{
 
     public List<Doctor> getAvailableDoctors() {
         return doctorRepository.getDoctorsByAvailable(true);
+    }
+
+    public Appointment getAppointmentById(String id) {
+        Appointment foundAppointment =  appointmentRepository.findById(id)
+                        .orElseThrow(() -> new AppointmentCollectionException("Appointment with id " + id + " not found"));
+        return foundAppointment;
     }
 }

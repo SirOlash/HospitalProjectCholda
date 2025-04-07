@@ -5,8 +5,8 @@ import jakarta.validation.Valid;
 import org.HospitalProjectCholda.data.models.Patient;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
 import org.HospitalProjectCholda.dtorequest.LoginRequest;
-//import org.HospitalProjectCholda.dtorequest.PatientProfileRequest;
 import org.HospitalProjectCholda.dtorequest.PatientRegistrationRequest;
+import org.HospitalProjectCholda.dtorequest.PatientResponseDTO;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.services.patientservice.PatientServices;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,17 +29,6 @@ public class PatientControllers {
     @Autowired
     private PatientRepository patientRepository;
 
-//    @PostMapping("/register")
-//    public ResponseEntity<?> registerPatient(@Valid @RequestBody PatientRegistrationRequest request) {
-//        try{
-//            Patient createdPatient = patientServices.createNewPatient(request);
-//            return new  ResponseEntity<Patient>(patient, HttpStatus.OK);
-//        }
-//        catch(ConstraintViolationException | PatientCollectionException e){
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.CONFLICT);
-//
-//        }
-//    }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerPatient(
@@ -72,20 +61,7 @@ public class PatientControllers {
         }
 
     }
-//    @PutMapping("/patient/{id}")
-//    public ResponseEntity<?> updatePatient(@PathVariable String id, @RequestBody Patient patient) {
-//        try{
-//            patientServices.updatePatient(id, patient);
-//            return new  ResponseEntity<>("Patient with id " + id + "updated successfully", HttpStatus.OK);
-//        }
-//        catch(ConstraintViolationException e){
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNPROCESSABLE_ENTITY);
-//        }
-//        catch(PatientCollectionException e){
-//            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
-//        }
-//
-//    }
+
     @PostMapping("/login")
     public ResponseEntity<?> loginPatient(@RequestBody LoginRequest login) {
         try{
@@ -97,6 +73,9 @@ public class PatientControllers {
         }
 
     }
+//    public ResponseEntity<?> updatePatientProfile(@Valid @RequestBody Patient patient) {
+//
+//    }
 
 
 
