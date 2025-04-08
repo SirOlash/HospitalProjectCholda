@@ -88,13 +88,13 @@ class AppointmentServicesTest {
         doctorRequest.setEmail("ben@gmail.com");
         doctorRequest.setPassword("password");
         doctorRequest.setAvailable(true);
-        Doctor craetedDoctor = doctorServices.createNewDoctor(doctorRequest);
+        DoctorResponseDTO createdDoctor = doctorServices.createNewDoctor(doctorRequest);
 
         DoctorProfile doctorProfile = new DoctorProfile();
         doctorProfile.setFirstName("Francis");
         doctorProfile.setLastName("McLean");
-        craetedDoctor.setDoctorProfile(doctorProfile);
-        doctorRepository.save(craetedDoctor);
+        createdDoctor.setDoctorProfile(doctorProfile);
+        doctorRepository.save(createdDoctor);
 
 
 

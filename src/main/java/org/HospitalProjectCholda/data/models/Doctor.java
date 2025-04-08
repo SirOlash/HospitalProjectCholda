@@ -34,9 +34,7 @@ public class Doctor {
 
     private String currentPatientId;
 
-//    public void setAvailable(boolean available) {
-//        this.available = available;
-//    }
+
 
 }
 

@@ -3,17 +3,15 @@ package org.HospitalProjectCholda.dtorequest;
 import lombok.Data;
 import lombok.Getter;
 import org.HospitalProjectCholda.data.models.Doctor;
-import org.springframework.data.annotation.Id;
+import org.HospitalProjectCholda.data.models.DoctorProfile;
 
 @Data
 public class DoctorResponseDTO {
 
-    @Getter
     private String email;
     private String fullName;
     private String userName;
     private boolean available = true;
-    @Id
     private String id;
 
     public DoctorResponseDTO(Doctor doctor) {
@@ -29,8 +27,11 @@ public class DoctorResponseDTO {
         }
 //        this.available = doctor.isAvailable();
         this.available = doctor.isAvailable();
-        this.id = id;
+        this.id = doctor.getId();
     }
 
 
+    public void setDoctorProfile(DoctorProfile doctorProfile) {
+        this.fullName = doctorProfile.getFirstName() + " " + doctorProfile.getLastName();
+    }
 }

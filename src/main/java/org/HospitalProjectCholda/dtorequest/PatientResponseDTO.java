@@ -21,8 +21,9 @@ public class PatientResponseDTO {
             this.fullName = patient.getPatientProfile().getFirstName() + " " + patient.getPatientProfile().getLastName();
         }
         else{
-            this.fullName = "Unknown name";
+            this.fullName = "No name in profile yet";
         }
+        this.id = patient.getId();
     }
 
 }

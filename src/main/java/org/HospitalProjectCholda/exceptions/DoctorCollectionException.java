@@ -15,8 +15,8 @@ public class DoctorCollectionException extends RuntimeException {
     }
 
 
-    public static String DoctorNotFound(String email) {
-        return  "Doctor with email: " + email + " not found";
+    public static String DoctorNotFound(String id) {
+        return  "Doctor with id: " + id + " not found";
     }
 
     public static String DoctorInvalidEmailOrPassword(String email) {

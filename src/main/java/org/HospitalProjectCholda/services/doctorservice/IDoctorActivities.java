@@ -6,30 +6,17 @@ import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.dtorequest.*;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
+import org.HospitalProjectCholda.exceptions.PatientCollectionException;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface IDoctorActivities {
 
-    //    @Override
-    //    public void updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest doctorProfile) {
-    //        Doctor foundDoctor = doctorRepository.findById(id)
-    //                .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(id)));
-    //
-    //        if (foundDoctor.getDoctorProfile() == null){
-    //            foundDoctor.setDoctorProfile(new DoctorProfile());
-    //        }
-    //        DoctorProfile updatedDoctor = foundDoctor.getDoctorProfile();
-    //
-    //        if (doctorProfile.getFirstName() != null) updatedDoctor.setFirstName(doctorProfile.getFirstName());
-    //        if (doctorProfile.getLastName() != null) updatedDoctor.setLastName(doctorProfile.getLastName());
-    //        if (doctorProfile.getAddress() != null) updatedDoctor.setAddress(doctorProfile.getAddress());
-    //        if (doctorProfile.getPhoneNumber() != null) updatedDoctor.setPhoneNumber(doctorProfile.getPhoneNumber());
-    //        doctorRepository.save(foundDoctor);
-    //    }
+
     void updateDoctorDetailedProfile(String id, PatientProfileDetailRequest profile);
 
-    public Doctor createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException, DoctorCollectionException;
+
 
     public long countAllDoctors();
 
@@ -41,14 +28,16 @@ public interface IDoctorActivities {
 
     public Doctor getSpecificDoctor(String doctorsId) throws DoctorCollectionException;
 
-    public List<Doctor> viewAvailableDoctors();
+//    public List<Doctor> viewAvailableDoctors();
 
     public AppointmentResponseDTO viewAppointment(String doctorEmail);
 
     public AppointmentResponseDTO convertToAppointmentResponseDTO(Appointment appointment);
 
-    public void updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest profile);
+    public Doctor updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest profile);
 
-    public void updateDoctorProfile(String currentDoctorId, DoctorRegistrationRequest newDoctorProfile);
+    public Doctor updateDoctorProfile(String currentDoctorId, DoctorRegistrationRequest newDoctorProfile);
+    public DoctorResponseDTO createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException, PatientCollectionException;
+    public List<AvailableDoctorResponse> getAllAvailableDoctors();
 }
 

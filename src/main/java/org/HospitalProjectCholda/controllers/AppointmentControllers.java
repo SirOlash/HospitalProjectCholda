@@ -4,10 +4,12 @@ package org.HospitalProjectCholda.controllers;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.HospitalProjectCholda.data.models.Appointment;
+import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
 import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
 import org.HospitalProjectCholda.dtorequest.AppointmentResponseDTO;
+import org.HospitalProjectCholda.dtorequest.AvailableDoctorResponse;
 import org.HospitalProjectCholda.dtorequest.TreatmentRequest;
 import org.HospitalProjectCholda.exceptions.AppointmentCollectionException;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
@@ -19,6 +21,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -38,9 +41,16 @@ public class AppointmentControllers {
     }
     @PostMapping("/book")
     public ResponseEntity<?> bookAppointment(@Valid @RequestBody AppointmentRequest bookingRequest) {
+
         try {
-            AppointmentResponseDTO bookedAppointment = appointmentServices.createAppointment(bookingRequest);
-            return new ResponseEntity<>(bookedAppointment, HttpStatus.CREATED);
+            if (bookingRequest == null || bookingRequest.getPatient().getId() == null) {
+                return ResponseEntity.badRequest().body("Patient ID is required");
+            }
+            AppointmentResponseDTO bookedAppointment = appointmentServices.bookAppointment(bookingRequest);
+            return new ResponseEntity<>(bookedAppointment, HttpStatus.OK);
+        }
+        catch(PatientCollectionException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     catch (
     DoctorCollectionException e) {
@@ -63,17 +73,24 @@ public class AppointmentControllers {
         }
 
     }
-    @PatchMapping("/accept")
-    public ResponseEntity<?> acceptAppointment(@RequestParam String doctorEmail,   @Valid @RequestBody TreatmentRequest request) {
+
+    @GetMapping("/available")
+    public ResponseEntity<?> getAvailableDoctors() {
+        List<AvailableDoctorResponse> availableDoctors =  doctorServices.getAllAvailableDoctors();
+
+        return ResponseEntity.ok(availableDoctors);
+
+
+    }
+    @PostMapping("/complete/{appointmentId}")
+    public ResponseEntity<?> completeAppointment(@PathVariable String appointmentId,
+                                                 @Valid @RequestBody TreatmentRequest treatmentRequest){
         try{
-            Appointment createdAppointment =  doctorServices.acceptAppointment(doctorEmail, request.getTreatment());
-            return new ResponseEntity<>(createdAppointment, HttpStatus.OK);
+            String appointmentResponse = appointmentServices.completeAppointment(appointmentId, treatmentRequest);
+            return ResponseEntity.ok(appointmentResponse);
         }
-        catch (DoctorCollectionException e){
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
-        }
-        catch (AppointmentCollectionException e){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        catch(Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
 
 

@@ -34,7 +34,7 @@ public class PatientServices implements IPatientActivities {
 
 
     @Override
-    public PatientRegistrationRequest createNewPatient(PatientRegistrationRequest request)
+    public PatientResponseDTO createNewPatient(PatientRegistrationRequest request)
             throws ConstraintViolationException, PatientCollectionException {
 
         Optional<Patient> foundPatient = patientRepository.findByEmail(request.getEmail());
@@ -58,19 +58,14 @@ public class PatientServices implements IPatientActivities {
         registeredPatient.setEncryptedPassword(passwordService.hashPassword(request.getPassword()));
 
 
-        patientRepository.save(registeredPatient);
+        Patient patient = patientRepository.save(registeredPatient);
 
-        return request;
+        return new PatientResponseDTO(patient);
     }
     @Override
     public List<Patient> getAllPatients() {
-        List<Patient> allPatient = patientRepository.findAll();
-        if (!allPatient.isEmpty()) {
-            return new  ArrayList<Patient>();
-        }
-        else{
-            return allPatient;
-        }
+
+        return patientRepository.findAll();
 
     }
 
@@ -112,16 +107,16 @@ public class PatientServices implements IPatientActivities {
                 .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientWithEmailNotFound(email))));
     }
 
-    @Override
-    public AppointmentResponseDTO bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException {
-        patientRepository.findById(appointmentRequest.getPatient().getId())
-                .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(appointmentRequest.getPatient().getId())));
-        return appointmentServices.createAppointment(appointmentRequest);
+//    @Override
+//    public AppointmentResponseDTO bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException {
+//        patientRepository.findById(appointmentRequest.getPatient().getId())
+//                .orElseThrow(() -> new PatientCollectionException("Patient not found with id " + appointmentRequest.getPatient().getId()));
+//        return appointmentServices.createAppointment(appointmentRequest);
+//
+//    }
 
-    }
-
     @Override
-    public void updatePatientProfile(String currentPatientId, PatientRegistrationRequest newPatientProfile) {
+    public Patient updatePatientProfile(String currentPatientId, PatientRegistrationRequest newPatientProfile) {
         Patient foundPatient = patientRepository.findById(currentPatientId)
                 .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(currentPatientId)));
 
@@ -142,6 +137,7 @@ public class PatientServices implements IPatientActivities {
         }
         patientRepository.save(foundPatient);
 
+        return foundPatient;
     }
 
     @Override
@@ -150,7 +146,7 @@ public class PatientServices implements IPatientActivities {
     }
 
     @Override
-    public void updatePatientDetailedProfile(String id, PatientProfileDetailRequest profile) {
+    public Patient updatePatientDetailedProfile(String id, PatientProfileDetailRequest profile) {
         Patient foundPatient = patientRepository.findById(id)
                 .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(id)));
 
@@ -166,6 +162,13 @@ public class PatientServices implements IPatientActivities {
         if (profile.getPhoneNumber() != null) patientProfile.setPhoneNumber(profile.getPhoneNumber());
         if (profile.getGender() != null) patientProfile.setGender(profile.getGender());
         patientRepository.save(foundPatient);
+        return foundPatient;
+    }
+    @Override
+    public List<MedicalHistory> viewMedicalHistory(String patientId){
+        Patient appointedPatient = patientRepository.findById(patientId)
+                .orElseThrow(() -> new PatientCollectionException(PatientCollectionException.PatientNotFoundException(patientId)));
+        return appointedPatient.getMedicalHistory();
     }
 }
 

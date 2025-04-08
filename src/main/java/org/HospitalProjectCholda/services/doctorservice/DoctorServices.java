@@ -13,12 +13,16 @@ import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
 import org.HospitalProjectCholda.services.appointmentservice.AppointmentServices;
 import org.HospitalProjectCholda.services.patientservice.PatientServices;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+//import static java.util.stream.Nodes.collect;
 
 
 @Service
@@ -43,7 +47,7 @@ public class DoctorServices implements IDoctorActivities{
     }
 
     @Override
-    public Doctor createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException,  PatientCollectionException {
+    public DoctorResponseDTO createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException,  PatientCollectionException {
 
         Optional<Doctor> foundDoctor = doctorRepository.findByEmail(doctorRequest.getEmail());
         if (foundDoctor.isPresent()){
@@ -67,11 +71,13 @@ public class DoctorServices implements IDoctorActivities{
         registeredDoctor.setEncryptedPassword(passwordService.hashPassword(doctorRequest.getPassword()));
 
 
-        doctorRepository.save(registeredDoctor);
+        Doctor savedDoctor = doctorRepository.save(registeredDoctor);
 
 
-        return registeredDoctor;
+        return new DoctorResponseDTO(savedDoctor);
     }
+
+
     @Override
     public long countAllDoctors() {
         return doctorRepository.count();
@@ -98,13 +104,8 @@ public class DoctorServices implements IDoctorActivities{
     }
     @Override
     public List<Doctor> getAllDoctors() {
-        List<Doctor> allRegisteredDoctor = doctorRepository.findAll();
-        if (allRegisteredDoctor.isEmpty()) {
-            return new ArrayList<Doctor>();
-        }
-        else{
-            return allRegisteredDoctor;
-        }
+
+        return doctorRepository.findAll();
     }
 
     @Override
@@ -118,11 +119,21 @@ public class DoctorServices implements IDoctorActivities{
         }
     }
 
+//    @Override
+//    public List<Doctor> viewAvailableDoctors() {
+//        return List.of();
+//    }
 
-    @Override
-    public List<Doctor> viewAvailableDoctors(){
-        return doctorRepository.getDoctorsByAvailable(true);
-    }
+
+//    @Override
+//    public List<Doctor> viewAvailableDoctors(){
+//        List<Doctor> availableDoctors = doctorRepository.findByAvailableTrue();
+//        if (availableDoctors.isEmpty()) {
+//            throw new DoctorCollectionException("No doctors available");
+//        }
+//
+//        return availableDoctors;
+//    }
 
     @Override
     public AppointmentResponseDTO viewAppointment(String doctorEmail){
@@ -166,7 +177,7 @@ public class DoctorServices implements IDoctorActivities{
         return appointmentRepository.save(appointment);
     }
     @Override
-    public void updateDoctorProfile(String currentDoctorId, DoctorRegistrationRequest newDoctorProfile) {
+    public Doctor updateDoctorProfile(String currentDoctorId, DoctorRegistrationRequest newDoctorProfile) {
         Doctor foundDoctor = doctorRepository.findById(currentDoctorId)
                 .orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(currentDoctorId)));
 
@@ -187,12 +198,13 @@ public class DoctorServices implements IDoctorActivities{
         }
         doctorRepository.save(foundDoctor);
 
+        return foundDoctor;
     }
 
 
 
     @Override
-    public void updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest profile) {
+    public Doctor updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest profile) {
         Doctor foundDoctor = doctorRepository.findById(id)
                 .orElseThrow(() -> new DoctorCollectionException(DoctorCollectionException.DoctorNotFound(id)));
 
@@ -206,6 +218,18 @@ public class DoctorServices implements IDoctorActivities{
         if (profile.getAddress() != null) doctorProfile.setAddress(profile.getAddress());
         if (profile.getPhoneNumber() != null) doctorProfile.setPhoneNumber(profile.getPhoneNumber());
         doctorRepository.save(foundDoctor);
+        return foundDoctor;
+    }
+
+    @Override
+    public List<AvailableDoctorResponse> getAllAvailableDoctors() {
+        return doctorRepository.findByIsAvailableTrue()
+                .stream()
+                .map(doctor -> new AvailableDoctorResponse(
+                        doctor.getUserName(),
+                        doctor.getEmail()
+                ))
+                .collect(Collectors.toList());
     }
 
 
