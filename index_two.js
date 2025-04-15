@@ -26,6 +26,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
         // Send JSON to Java backend
         fetch("http://localhost:8080/api/patients/register", {
+
             method: "POST",
             headers: {
                 "Content-Type": "application/json"

@@ -6,6 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.net.DatagramPacket;
+
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
@@ -32,8 +34,9 @@ public class Doctor {
 
     private boolean hasAcceptedAppointment;
 
-    private String currentPatientId;
+    private String specialty;
 
+    private String currentPatientId;
 
 
 }

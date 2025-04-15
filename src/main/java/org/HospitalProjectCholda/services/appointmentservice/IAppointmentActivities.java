@@ -1,6 +1,5 @@
 package org.HospitalProjectCholda.services.appointmentservice;
 
-import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
 import org.HospitalProjectCholda.dtorequest.AppointmentResponseDTO;

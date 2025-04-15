@@ -84,12 +84,26 @@ public class AppointmentServices implements IAppointmentActivities{
         return foundAppointment;
     }
 
+//    @Override
+//    public AppointmentResponseDTO bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException {
+//        patientRepository.findById(appointmentRequest.getPatient().getId())
+//                .orElseThrow(() -> new PatientCollectionException("Patient not found with id " + appointmentRequest.getPatient().getId()));
+//        return createAppointment(appointmentRequest);
+//
+//    }
+
+
+
     @Override
     public AppointmentResponseDTO bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException {
+        if (appointmentRequest.getPatient() == null) {
+            throw new PatientCollectionException("Patient information is missing in the request.");
+        }
+
         patientRepository.findById(appointmentRequest.getPatient().getId())
                 .orElseThrow(() -> new PatientCollectionException("Patient not found with id " + appointmentRequest.getPatient().getId()));
-        return createAppointment(appointmentRequest);
 
+        return createAppointment(appointmentRequest);
     }
 
 //    @Override

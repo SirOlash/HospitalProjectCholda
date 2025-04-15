@@ -8,7 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "patientProfile")
@@ -21,6 +20,13 @@ public class PatientProfile extends UserProfile{
     private String id;
     private LocalDate dateOfBirth;
     private Gender gender;
+
+    @Override
+    public String toString(){
+        String birthday = (getDateOfBirth() != null) ? getDateOfBirth().toString() : "N/A";
+        String gender1 = (getGender() != null) ? getGender().toString() : "N/A";
+        return super.toString() + ", date of birth=" + birthday + ", gender=" + gender1;
+    }
 
 
 }

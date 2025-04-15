@@ -4,9 +4,6 @@ package org.HospitalProjectCholda.controllers;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.Valid;
 import org.HospitalProjectCholda.data.models.Appointment;
-import org.HospitalProjectCholda.data.models.Doctor;
-import org.HospitalProjectCholda.data.repositories.AppointmentRepository;
-import org.HospitalProjectCholda.data.repositories.DoctorRepository;
 import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
 import org.HospitalProjectCholda.dtorequest.AppointmentResponseDTO;
 import org.HospitalProjectCholda.dtorequest.AvailableDoctorResponse;
@@ -63,8 +60,8 @@ public class AppointmentControllers {
 
 
     }
-    @GetMapping("/{d}")
-    public ResponseEntity<?> getAppointmentBYId(@PathVariable String id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getAppointmentById(@PathVariable String id) {
         try{
             Appointment createdAppointment = appointmentServices.getAppointmentById(id);
             return new ResponseEntity<>(createdAppointment, HttpStatus.OK);

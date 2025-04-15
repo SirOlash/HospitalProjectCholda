@@ -21,7 +21,7 @@ public class AppointmentResponseDTO {
     private boolean available = true;
 
     public AppointmentResponseDTO(Appointment appointment) {
-        this.appointmentId = appointment.getId();
+//        this.appointmentId = appointment.getId();
         this.patient = new PatientResponseDTO(appointment.getPatient());
         this.description = appointment.getDescription();
         this.appointmentTime = appointment.getAppointmentTime();
@@ -32,4 +32,6 @@ public class AppointmentResponseDTO {
     public void setDoctorEmail(@NotNull(message = "email cannot be empty!") String email) {
         this.doctor.setEmail(email);
     }
+
+
 }

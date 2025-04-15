@@ -37,6 +37,15 @@ public class MedicalHistory {
         return treatment;
     }
 
+    @Override
+    public String toString() {
+        return "History{" +
+                "date=" + recordDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")) +
+                ", description='" + description + '\'' +
+                ", treatment='" + treatment + '\'' +
+                '}';
+    }
+
 
 }
 

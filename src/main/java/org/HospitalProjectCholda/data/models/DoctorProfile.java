@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+@Getter
 @EqualsAndHashCode(callSuper = true)
 @Document(collection = "doctorProfile")
 @AllArgsConstructor
@@ -11,11 +12,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 public class DoctorProfile extends UserProfile{
 
-    @Getter
-    private String specialty;
     private MaritalStatus maritalStatus;
 
-    //    public DoctorProfile(String firstName, String lastName, String phoneNumber, String address) {
-//        super(firstName, lastName, phoneNumber, address);
-//    }
+
 }

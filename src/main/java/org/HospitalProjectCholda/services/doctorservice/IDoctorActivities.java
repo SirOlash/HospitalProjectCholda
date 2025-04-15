@@ -7,14 +7,13 @@ import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.dtorequest.*;
 import org.HospitalProjectCholda.exceptions.DoctorCollectionException;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
-import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface IDoctorActivities {
 
 
-    void updateDoctorDetailedProfile(String id, PatientProfileDetailRequest profile);
+
 
 
 
@@ -34,10 +33,17 @@ public interface IDoctorActivities {
 
     public AppointmentResponseDTO convertToAppointmentResponseDTO(Appointment appointment);
 
-    public Doctor updateDoctorDetailedProfile(String id, DoctorProfileDetailRequest profile);
+    void updateDoctorDetailedProfile(String id, PatientProfileDetailRequest profile);
 
-    public Doctor updateDoctorProfile(String currentDoctorId, DoctorRegistrationRequest newDoctorProfile);
     public DoctorResponseDTO createNewDoctor(DoctorRegistrationRequest doctorRequest) throws ConstraintViolationException, PatientCollectionException;
+
+    DoctorProfileResponse viewDoctorProfileById(String patientId);
+
     public List<AvailableDoctorResponse> getAllAvailableDoctors();
+    DoctorUpdateResponse updateDoctorProfile(String currentDoctorId, DoctorRegistrationRequest newDoctorProfile);
+
+    DoctorUpdateResponse updateDoctorDetailedProfile(String doctorId, DoctorProfileDetailRequest profile);
+
+    DoctorProfileDetailResponse viewDoctorDetailedProfileById(String doctorId);
 }
 

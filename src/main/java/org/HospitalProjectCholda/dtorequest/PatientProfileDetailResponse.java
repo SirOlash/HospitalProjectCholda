@@ -1,29 +1,28 @@
 package org.HospitalProjectCholda.dtorequest;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.HospitalProjectCholda.data.models.Gender;
 import org.springframework.cglib.core.Local;
 
+import java.net.DatagramPacket;
 import java.time.LocalDate;
 
 @Data
-public class PatientProfileDetailRequest {
-
+@AllArgsConstructor
+@NoArgsConstructor
+public class PatientProfileDetailResponse {
     private String firstName;
     private String lastName;
-
-//    @Pattern(regexp = "^(\\+234|0)[789][01]\\d{8}$", message = "Invalid phone number format")
     private String phoneNumber;
     private String address;
+    private LocalDate dateOfBirth;
+    private Gender gender;
 
-//    @JsonFormat(pattern = "yyyy-MM-dd")
-    private String dateOfBirth;
 
-    @NotNull(message = "Gender cannot be empty!")
-    private String gender;
+
 
 }

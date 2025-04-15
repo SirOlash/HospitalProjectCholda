@@ -3,11 +3,9 @@ package org.HospitalProjectCholda.services;
 import org.HospitalProjectCholda.data.models.Gender;
 import org.HospitalProjectCholda.data.models.Patient;
 
-import org.HospitalProjectCholda.data.models.PatientProfile;
 import org.HospitalProjectCholda.data.repositories.PatientRepository;
 import org.HospitalProjectCholda.dtorequest.PatientProfileDetailRequest;
 import org.HospitalProjectCholda.dtorequest.PatientRegistrationRequest;
-import org.HospitalProjectCholda.dtorequest.PatientResponseDTO;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
 import org.HospitalProjectCholda.services.patientservice.PatientServices;
@@ -15,11 +13,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.amqp.RabbitConnectionDetails;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -104,8 +100,8 @@ class PatientServicesTest {
         PatientProfileDetailRequest profile = new PatientProfileDetailRequest();
         profile.setFirstName("Silas");
         profile.setLastName("Mina");
-        profile.setGender(Gender.MALE);
-        profile.setDateOfBirth(LocalDate.of(1990, 8, 13));
+        profile.setGender(String.valueOf(Gender.MALE));
+        profile.setDateOfBirth(String.valueOf(LocalDate.of(1990, 8, 13)));
         profile.setAddress("Sabo-yaba");
         profile.setPhoneNumber("08164567890");
 
