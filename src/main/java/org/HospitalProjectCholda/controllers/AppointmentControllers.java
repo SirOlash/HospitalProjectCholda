@@ -54,9 +54,10 @@ public class AppointmentControllers {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage());
     } catch (ConstraintViolationException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-    } catch (Exception e) {
-        return ResponseEntity.internalServerError().body("An error occurred");
-    }
+    }catch (Exception e) {
+            e.printStackTrace(); // Add this to see error in console/logs
+            return ResponseEntity.internalServerError().body("An error occurred");
+        }
 
 
     }
@@ -92,6 +93,5 @@ public class AppointmentControllers {
 
 
     }
-
 
 }

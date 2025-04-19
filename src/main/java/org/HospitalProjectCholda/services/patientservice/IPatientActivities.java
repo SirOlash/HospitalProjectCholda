@@ -32,4 +32,5 @@ public interface IPatientActivities {
 
     PatientUpdateResponse updatePatientDetailedProfile(String patientId, PatientProfileDetailRequest profile);
     PatientDetailedProfileResponse viewPatientDetailedProfileById(String patientId);
+
 }

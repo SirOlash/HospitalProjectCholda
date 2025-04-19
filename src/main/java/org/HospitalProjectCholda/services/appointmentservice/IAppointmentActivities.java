@@ -1,5 +1,6 @@
 package org.HospitalProjectCholda.services.appointmentservice;
 
+import org.HospitalProjectCholda.data.models.Appointment;
 import org.HospitalProjectCholda.data.models.Doctor;
 import org.HospitalProjectCholda.dtorequest.AppointmentRequest;
 import org.HospitalProjectCholda.dtorequest.AppointmentResponseDTO;
@@ -13,7 +14,8 @@ public interface IAppointmentActivities {
 //    public boolean checkPatientCanBookAppointment(String patientId, String doctorEmail);
 //    public Appointment createAppointment(Appointment appointment);
     public AppointmentResponseDTO createAppointment(AppointmentRequest request);
-//    public Appointment completeAppointment(String appointmentId);
+
+    //    public Appointment completeAppointment(String appointmentId);
     public List<Doctor> getAvailableDoctors();
     public AppointmentResponseDTO bookAppointment(AppointmentRequest appointmentRequest) throws PatientCollectionException;
 

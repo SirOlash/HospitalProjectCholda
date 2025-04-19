@@ -9,6 +9,7 @@ import org.HospitalProjectCholda.dtorequest.*;
 import org.HospitalProjectCholda.dtorequest.PatientUpdateResponse;
 import org.HospitalProjectCholda.exceptions.PatientCollectionException;
 import org.HospitalProjectCholda.security.PasswordService;
+import org.HospitalProjectCholda.services.appointmentservice.AppointmentServices;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -25,7 +26,7 @@ public class PatientServices implements IPatientActivities {
     private PasswordService passwordService;
 
 
-//    private AppointmentServices appointmentServices;
+    private AppointmentServices appointmentServices;
 
 
 //    private AppointmentRepository appointmentRepository;
@@ -315,5 +316,6 @@ public class PatientServices implements IPatientActivities {
         return patientUpdateResponse;
 
     }
+
 }
 

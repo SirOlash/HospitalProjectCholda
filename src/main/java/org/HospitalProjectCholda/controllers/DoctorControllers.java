@@ -28,8 +28,7 @@ public class DoctorControllers {
 
     @Autowired
     private DoctorRepository doctorRepository;
-    @Autowired
-    private IDoctorActivities iDoctorActivities;
+
 
     @PostMapping("/register")
     public ResponseEntity<?> registerDoctor(@Valid @RequestBody DoctorRegistrationRequest doctorRequest) {
