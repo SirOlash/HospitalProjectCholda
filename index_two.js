@@ -5,22 +5,14 @@ document.addEventListener("DOMContentLoaded", function () {
         e.preventDefault();
 
         // Get input values
-        const firstName = document.getElementById("firstName").value;
-        const lastName = document.getElementById("lastName").value;
+        const firstName = document.getElementById("username").value;
         const email = document.getElementById("email").value;
-        const phone = document.getElementById("phone").value;
-        const address = document.getElementById("address").value;
-        const dob = document.getElementById("dob").value;
         const password = document.getElementById("password").value;
 
         // Create JSON object
         const patientData = {
-            firstName,
-            lastName,
+            username,
             email,
-            phone,
-            address,
-            dob,
             password
         };
 
